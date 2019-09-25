@@ -1,10 +1,11 @@
 {
-  "name": "webapp",
+  "name": "Assignments02",
   "version": "1.0.0",
-  "description": "",
+  "description": "## Team Information",
   "main": "index.js",
   "scripts": {
-    "test": "node_modules/mocha/bin/mocha ./tests"
+    "test": "node_modules/mocha/bin/mocha ./tests",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",

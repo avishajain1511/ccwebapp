@@ -1,5 +1,5 @@
 var bcrypt = require('bcrypt');
-var validator = require("../node_modules/email-validator");
+var validator = require("email-validator");
 var mysql      = require('mysql');
 var connection = require('../models/app.model');
 var schema = require('./passwordValidator');
@@ -124,6 +124,7 @@ exports.login = function(req,res){
             }
         });
 };
+
 
 // update user information
 
