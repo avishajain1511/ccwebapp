@@ -70,3 +70,53 @@ exports.register = function(req,res){
     });
 
   };
+
+exports.login = function(req,res){
+      
+    var token = req.headers['authorization'];
+
+    if (!token) return res.status(401).send({ auth: false, message: 'Unauthorized' });
+    
+    var tmp = token.split(' ');
+    var buf = new Buffer(tmp[1], 'base64');
+    var plain_auth = buf.toString();
+    var creds = plain_auth.split(':');
+
+    var username = creds[0];
+    var password = creds[1];
+    
+    
+    if (username==null || password==null) {
+          return res.status(401).send({ auth: false, message: 'Unauthorized' });
+        }
+        console.log("user" +  username, "password " + password );
+        connection.query('SELECT * FROM users WHERE email = ?',username, function (error, results, fields) {
+            if (error) {
+                res.status(401).send({ auth: false, message: 'Unauthorize' });
+            }else{
+                if(results.length >0){
+                    if(bcrypt.compareSync(password,results[0].password) || password==results[0].password){
+                        var sql ='SELECT id , firstname, lastname, email, created, modified  FROM users WHERE email = ?';
+                        var insert =[username]
+                        var result =  mysql.format(sql,insert);
+        
+                        connection.query(result, function (error, result, fields) {
+                            if (error) {
+                                console.log("Bad Request",error);
+                                res.status(401).send({ auth: false, message: 'Unauthorize' });
+                        }
+                        else{
+                            res.send(result);
+                        }
+                    });
+                }
+                else{
+                    res.status(401).send({ auth: false, message: 'Unauthorize' });
+                }
+            }
+            else{
+                res.status(401).send({ auth: false, message: 'Unauthorized' });
+                }
+            }
+        });
+};
