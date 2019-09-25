@@ -21,17 +21,15 @@ mysql
 
 git clone git@github.com:achirashah/ccwebapp.git
 
-cd ccwebapp
-
-server.js
+cd ccwebapp/webapp
 
 npm install
 
-npm start
+server.js
 
 ## Deploy Instructions
 
-server.js
+
 
 ## Routes
 
