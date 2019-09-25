@@ -24,14 +24,5 @@
     "passport-jwt": "^4.0.0",
     "password-validator": "^5.0.2",
     "uuid": "^3.3.3"
-  },
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/chethansreenivas/ccwebapp.git"
-  },
-  "bugs": {
-    "url": "https://github.com/chethansreenivas/ccwebapp/issues"
-  },
-  "homepage": "https://github.com/chethansreenivas/ccwebapp#readme"
+  }
 }
