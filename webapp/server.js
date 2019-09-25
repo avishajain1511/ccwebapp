@@ -7,6 +7,7 @@ server.use(bodyParser.json());
 server.use('/v1',app);
 
 let port = 3001;
+
 server.use(function(req, res, next){
 if (req.accepts('html')) {
     res.status(404).send({message:"Bad Request"}) ;
@@ -15,4 +16,8 @@ if (req.accepts('html')) {
     });
 server.listen(port,()=>{
 console.log('Server is up and running on port number' + port);
+
 });
+
+module.exports = server;
+

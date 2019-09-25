@@ -4,7 +4,7 @@
   "description": "## Team Information",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node_modules/mocha/bin/mocha ./tests",
     "start": "node server.js"
   },
   "keywords": [],
@@ -14,15 +14,20 @@
     "basic-auth-token": "^0.4.2",
     "bcrypt": "^3.0.6",
     "body-parser": "^1.19.0",
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
     "email-validator": "^2.0.4",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
+    "mocha": "^6.2.0",
     "mongoose": "^5.7.1",
     "morgan": "^1.9.1",
     "mysql": "^2.17.1",
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "password-validator": "^5.0.2",
+    "superagent": "^5.1.0",
+    "supertest": "^4.0.2",
     "uuid": "^3.3.3"
   }
 }
