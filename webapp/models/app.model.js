@@ -1,4 +1,4 @@
-
+// connecting to database
 
 var mysql = require('mysql');
 

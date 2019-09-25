@@ -1,4 +1,5 @@
 var passwordValidator = require('password-validator');
+
 var schema = new passwordValidator();
 schema
 .is().min(8)                                    // Minimum length 8

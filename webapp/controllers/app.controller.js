@@ -5,6 +5,8 @@ var connection = require('../models/app.model');
 var schema = require('./passwordValidator');
 const uuidv1 = require('uuid/v1');
 
+// creating user from request input and adding to database
+
 exports.register = function(req,res){
     
     console.log("req",req.body);
@@ -71,6 +73,8 @@ exports.register = function(req,res){
 
   };
 
+// get user information with basic auth
+
 exports.login = function(req,res){
       
     var token = req.headers['authorization'];
@@ -120,6 +124,9 @@ exports.login = function(req,res){
             }
         });
 };
+
+
+// update user information
 
 exports.update = function(req,res){
     var today = new Date();
