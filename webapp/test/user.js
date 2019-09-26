@@ -20,6 +20,7 @@ const wrongPostCredentials2 = {
     firstname: "testinggitproj",
     lastname: "test",
     password: "PaSSword@123"
+    
 }
 
 const wrongCreds = {
@@ -38,30 +39,32 @@ var authenticatedUser = request.agent(app);
 
 describe('GET /user', function (done) {
 
-    it("should get all students record", (done) => {
+    it("Get User from creds", (done) => {
         chai.request(app)
             .get('/v1/user/self')
             .auth('arjun@gmail.com', 'PaSSword@123')
             .then((res) => {
                 //assertions
                 expect(res).to.have.status(200);
-                expect(res.body.message).to.be.equal("Auth OK");
-                expect(res.body.errors.length).to.be.equal(0);
+                this.timeout(500);
+                setTimeout(done, 300);
             }).catch(err => {
-                console.log(err.message);
-            }).then(done);
+                done(err);
+            })
     });
     it("wrong creds", (done) => {
         chai.request(app)
             .put('/v1/user/self')
-            .auth('arjun@gmail.com', 'PaSSword@123')
+            .auth('arjun@gmail.com', 'PaSword@123')
             .send(wrongCreds)
             .then((res) => {
                 //assertions
+                this.timeout(500);
+                setTimeout(done, 300);
                 expect(res).to.have.status(400);
             }).catch(err => {
-                console.log(err.message);
-            }).then(done);
+                done(err);
+            })
     });
     it("valid creds", (done) => {
         chai.request(app)
@@ -70,10 +73,12 @@ describe('GET /user', function (done) {
             .send(validCreds)
             .then((res) => {
                 //assertions
-                expect(res).to.have.status(200);
+                this.timeout(500);
+                setTimeout(done, 300);
+                expect(res).to.have.status(204);
             }).catch(err => {
-                console.log(err.message);
-            }).then(done);
+                done(err);
+            })
     });
     it("Unvalid creds", (done) => {
         chai.request(app)
@@ -81,6 +86,8 @@ describe('GET /user', function (done) {
             .send(wrongPostCredentials)
             .then((res) => {
                 //assertions
+                this.timeout(500);
+                setTimeout(done, 300);
                 expect(res).to.have.status(400);
                 done();
             }).catch(err => {
@@ -93,6 +100,8 @@ describe('GET /user', function (done) {
             .send(wrongPostCredentials2)
             .then((res) => {
                 //assertions
+                this.timeout(500);
+                setTimeout(done, 300);
                 expect(res).to.have.status(400);
                 done();
 
