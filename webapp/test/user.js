@@ -70,7 +70,7 @@ describe('GET /user', function (done) {
             .send(validCreds)
             .then((res) => {
                 //assertions
-                expect(res).to.have.status(200);
+                expect(res).to.have.status(204);
             }).catch(err => {
                 console.log(err.message);
             }).then(done);
