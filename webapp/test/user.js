@@ -38,7 +38,32 @@ const validCreds = {
 var authenticatedUser = request.agent(app);
 
 describe('GET /user', function (done) {
-
+    it("valid entry ", (done)=> {
+        chai.request(app)
+        .post('/v1/recipe/:id')
+        .auth('arjun@gmail.com', 'PaSSword@123')
+        .send(request['id'])
+        .then((res) => {
+            //assertions
+            expect(res).to.have.status(201);
+        }).catch(err => {
+            console.log(err.message);
+        }).then(done);
+    });
+    it("Invalid entry ", (done) => {
+        chai.request(app)
+        .post('/v1/recipe/:id')
+        .auth('arjun@gmail.com', 'PaSSword@123')
+        .send(invalidRecipe)
+        .then((res) => {
+            //assertions
+            expect(res).to.have.status(404);
+            done();
+        }).catch(err => {
+            done(err);
+        });
+    });
+});
     it("Get User from creds", (done) => {
         chai.request(app)
             .get('/v1/user/self')
