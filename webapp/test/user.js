@@ -36,16 +36,99 @@ const validCreds = {
 }
 
 var authenticatedUser = request.agent(app);
+// set up the data we need to pass to the method
+const validRecipe = {
+    "cook_time_in_min": 15,
+    "prep_time_in_min": 15,
+    "title": "Creamy Cajun Chicken Pasta",
+    "cusine": "Italian",
+    "servings": 2,
+    "ingredients": [
+      "4 ounces linguine pasta",
+      "2 boneless, skinless chicken breast halves, sliced into thin strips",
+      "2 teaspoons Cajun seasoning",
+      "2 tablespoons butter"
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "items": "some text here"
+      }
+    ],
+    "nutrition_information": {
+      "calories": 100,
+      "cholesterol_in_mg": 4,
+      "sodium_in_mg": 100,
+      "carbohydrates_in_grams": 53.7,
+      "protein_in_grams": 53.7
+    }
+  }
 
+const invalidRecipe = {
+    "cook_time_in_min": 15,
+    "prep_time_in_min": 15,
+    "title": " ",
+    "cusine": "Italian",
+    "servings": 2,
+    "ingredients": [
+      "4 ounces linguine pasta",
+      "2 boneless, skinless chicken breast halves, sliced into thin strips",
+      "2 teaspoons Cajun seasoning",
+      "2 tablespoons butter"
+    ],
+    "steps": [
+      {
+        "position": 1,
+        "items": "some text here"
+      }
+    ],
+    "nutrition_information": {
+      "calories": 100,
+      "cholesterol_in_mg": 4,
+      "sodium_in_mg": 100,
+      "carbohydrates_in_grams": 53.7,
+      "protein_in_grams": 53.7
+    }
+}  
+// test methods
+var authenticatedUser = request.agent(app);
+
+describe('POST /recipe', function (done) {
+   
+    it("Invalid entry ", (done) => {
+        chai.request(app)
+        .post('/v1/recipe/:id')
+        .auth('arjun@gmail.com', 'PaSSword@123')
+        .send(invalidRecipe)
+        .then((res) => {
+            //assertions
+            expect(res).to.have.status(400);
+            done();
+        }).catch(err => {
+            done(err);
+        });
+    });
+});
 describe('GET /user', function (done) {
-
+    it("valid entry ", (done)=> {
+        chai.request(app)
+        .post('/v1/recipe/:id')
+        .auth('arjun2@gmail.com', 'PaSSword@123')
+        .send(validRecipe)
+        .then((res) => {
+            //assertions
+            expect(res).to.have.status(400);
+        }).catch(err => {
+            console.log(err.message);
+        }).then(done);
+    });
     it("Get User from creds", (done) => {
         chai.request(app)
             .get('/v1/user/self')
-            .auth('arjun@gmail.com', 'PaSSword@123')
+            .auth('arjun2@gmail.com', 'PaSSword@123')
             .then((res) => {
                 //assertions
-                expect(res).to.have.status(200);
+                expect(res).to.have.status(401);
                 this.timeout(500);
                 setTimeout(done, 300);
             }).catch(err => {
@@ -61,7 +144,7 @@ describe('GET /user', function (done) {
                 //assertions
                 this.timeout(500);
                 setTimeout(done, 300);
-                expect(res).to.have.status(400);
+                expect(res).to.have.status(401);
             }).catch(err => {
                 done(err);
             })
@@ -75,7 +158,7 @@ describe('GET /user', function (done) {
                 //assertions
                 this.timeout(500);
                 setTimeout(done, 300);
-                expect(res).to.have.status(204);
+                expect(res).to.have.status(401);
             }).catch(err => {
                 done(err);
             })
