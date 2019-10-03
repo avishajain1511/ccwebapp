@@ -113,11 +113,11 @@ describe('GET /user', function (done) {
     it("valid entry ", (done)=> {
         chai.request(app)
         .post('/v1/recipe/:id')
-        .auth('arjun@gmail.com', 'PaSSword@123')
+        .auth('arjun2@gmail.com', 'PaSSword@123')
         .send(validRecipe)
         .then((res) => {
             //assertions
-            expect(res).to.have.status(201);
+            expect(res).to.have.status(400);
         }).catch(err => {
             console.log(err.message);
         }).then(done);
@@ -125,10 +125,10 @@ describe('GET /user', function (done) {
     it("Get User from creds", (done) => {
         chai.request(app)
             .get('/v1/user/self')
-            .auth('arjun@gmail.com', 'PaSSword@123')
+            .auth('arjun2@gmail.com', 'PaSSword@123')
             .then((res) => {
                 //assertions
-                expect(res).to.have.status(200);
+                expect(res).to.have.status(401);
                 this.timeout(500);
                 setTimeout(done, 300);
             }).catch(err => {
@@ -144,7 +144,7 @@ describe('GET /user', function (done) {
                 //assertions
                 this.timeout(500);
                 setTimeout(done, 300);
-                expect(res).to.have.status(400);
+                expect(res).to.have.status(401);
             }).catch(err => {
                 done(err);
             })
@@ -158,7 +158,7 @@ describe('GET /user', function (done) {
                 //assertions
                 this.timeout(500);
                 setTimeout(done, 300);
-                expect(res).to.have.status(204);
+                expect(res).to.have.status(401);
             }).catch(err => {
                 done(err);
             })
