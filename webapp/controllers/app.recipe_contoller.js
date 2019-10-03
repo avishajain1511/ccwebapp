@@ -641,3 +641,72 @@ exports.updateRecipe = function (req, res) {
     }
   });
 }
+
+exports.getRecipe = function (req, res) {
+
+  console.log(req.params['id']);
+
+  var recipeid = req.params['id'];
+
+  var output;
+  connection.query("SELECT  id, created_ts,updated_ts,author_id,cook_time_in_min,prep_time_in_min,total_time_in_min,title,cusine,servings,ingredients FROM recipe where id =?", recipeid, function (error, results, fields) {
+    if (error) {
+      return res.status(400).send({ message: 'Bad  Request' });
+    } else {
+      var ingredients = [];
+      if (results.length > 0) {
+
+        var ingredientsList = JSON.stringify(results[0]['ingredients']);
+        console.log(ingredientsList);
+        ingredientsList = ingredientsList.split(",")
+
+        for (i in ingredientsList) {
+          ingredients[i] = ingredientsList[i];
+          console.log(ingredients)
+          ingredients[i] = ingredientsList[i].replace(/[\\"\[\]]/g, '');
+
+          console.log(ingredients[i]);
+        }
+
+        console.log(results[0]['steps']);
+        console.log(results[0]);
+        connection.query(' SELECT position, items from orderlist where recipeTable_idrecipe=? ', recipeid, function (error, results1, fields) {
+          if (error) {
+            return res.status(400).send({ message: 'Bad Request' });
+          } else {
+            console.log(results1)
+            if (results.length > 0) {
+              console.log("------------" + recipeid);
+              connection.query(' SELECT * from NutritionInformation where recipeTable_idrecipe=? ', recipeid, function (error, results2, fields) {
+                if (error) {
+                  return res.status(400).send({ message: 'Bad Request' });
+                } else {
+                  if (results2.length > 0) {
+                    console.log("result------------" + results2.length);
+
+                    output = results[0];
+                    output['ingredients'] = ingredients
+                    output['steps'] = results1
+                    output['nutrition_information'] = results2[0]
+                    console.log(results2);
+                    res.send(output);
+
+                  }
+                  else {
+                    return res.status(400).send({ message: 'Bad  Request, No Value for this id available in NutritionInformation' });
+                  }
+                }
+              });
+            }
+            else {
+              return res.status(400).send({ message: 'Bad  Request, No Value for this id available in orderlist' });
+            }
+          }
+        });
+      }
+      else {
+        return res.status(400).send({ message: 'Bad  Request, No Result Available in Recipe' });
+      }
+    }
+  });
+};
