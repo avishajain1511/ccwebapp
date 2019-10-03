@@ -13,9 +13,9 @@ exports.register = function(req,res){
         return res.status(400).send({message: 'Bad Request'
     })};
 
-    if(!validator.validate(req.body.email)){return res.status(400).send({ message: 'Bad Request'})};
+    if(!validator.validate(req.body.email)){return res.status(400).send({ message: 'Bad Request, invalid Email'})};
 
-    if(!schema.validate(req.body.password)){return  res.status(400).send({  message: 'Bad Request'})};
+    if(!schema.validate(req.body.password)){return  res.status(400).send({  message: 'Bad Request, invalid Password'})};
 
     var salt = bcrypt.genSaltSync(10);
     var hash = bcrypt.hashSync(req.body.password, salt);
@@ -38,7 +38,7 @@ exports.register = function(req,res){
         var count = result[0].Count;
        console.log("------------"+count)
         if(count>=1){
-           return res.status(400).send({message: 'Bad Request' });
+           return res.status(400).send({message: 'Bad Request, Invalid Input' });
         }else{
             connection.query('INSERT INTO users SET ?',users, function (error, results, fields) {
                 if (error) {
@@ -61,7 +61,7 @@ exports.register = function(req,res){
                         })
                     }
                     else{
-                        res.status(201).send(result);
+                        res.status(201).send(result[0]);
                     }
                 });
                 }
@@ -94,23 +94,21 @@ exports.register = function(req,res){
     
       connection.query('SELECT * FROM users WHERE email = ?',username, function (error, results, fields) {
           if (error) {
-            return res.status(400).send({ message: 'Bad Request' });
+            return res.status(404).send({ message: 'Bad Request' });
           }else{
             if(results.length >0){
               if(bcrypt.compareSync(password,results[0].password) ){
                 console.log("-----------Updating----------------------")
                   for (var i = 0; i < keys.length; i++) {
-                      if(keys[i]=="email" || keys[i]=="modified"||keys[i]=="created"){
-                        return res.status(400).send({ message: 'Bad Request' });
-                      }          
+                              
                       parm = parm + keys[i]+"= ?, ";
                       if(keys[i]=="password"){
-                        if(!schema.validate(req.body.password)){return res.status(400).send({"failed":"Bad Request"})};
+                        if(!schema.validate(req.body.password)){return res.status(400).send({"failed":"Bad Request, invalid Password"})};
                           var salt = bcrypt.genSaltSync(10);
                           var hash = bcrypt.hashSync(req.body[keys[i]], salt);
                           insertParam.push(hash);
                         }else{
-                            if((req.body[keys[i]]).trim().length<1){ return res.status(400).send({"failed":"Bad Request"})};
+                            if((req.body[keys[i]]).trim().length<1){ return res.status(400).send({"failed":"Bad Request, feilds Cannot be empty"})};
                             insertParam.push(req.body[keys[i]]);
                         }
                   }
@@ -144,11 +142,11 @@ exports.register = function(req,res){
                       });
                
               }else{
-                return res.status(400).send({ message: 'Bad Request' });
+                return res.status(401).send({ message: 'Unauthorized' });
           } 
             }
             else{
-                return res.status(400).send({ message: 'Bad Request' });
+                return res.status(404).send({ message: 'Content Not Found' });
             }
               
             }
@@ -159,7 +157,7 @@ exports.register = function(req,res){
       
     var token = req.headers['authorization'];
 
-    if (!token) return res.status(400).send({ message: 'Bad Request' });
+    if (!token) return res.status(401).send({ message: 'Unauthorization' });
     
     var tmp = token.split(' ');
     var buf = new Buffer(tmp[1], 'base64');
@@ -176,7 +174,7 @@ exports.register = function(req,res){
         console.log("user" +  username, "password " + password );
         connection.query('SELECT * FROM users WHERE email = ?',username, function (error, results, fields) {
             if (error) {
-                return res.status(400).send({ message: 'Bad Request' });
+                return res.status(404).send({ message: 'Bad Request' });
             }else{
                 if(results.length >0){
                     if(bcrypt.compareSync(password,results[0].password) || password==results[0].password){
@@ -187,7 +185,7 @@ exports.register = function(req,res){
                         connection.query(result, function (error, result, fields) {
                             if (error) {
                                 console.log("Bad Request",error);
-                                return res.status(400).send({ message: 'Bad Request' });
+                                return res.status(404).send({ message: 'Bad Request' });
                         }
                         else{
                             res.send(result);
@@ -195,11 +193,11 @@ exports.register = function(req,res){
                     });
                 }
                 else{
-                    return res.status(400).send({ message: 'Bad Request' });
+                    return res.status(401).send({ message: 'Unauthorized' });
                 }
             }
             else{
-                return res.status(400).send({ message: 'Bad Request' });
+                return res.status(404).send({ message: 'Bad Request' });
                 }
             }
         });
