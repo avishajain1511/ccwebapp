@@ -36,7 +36,10 @@ Routes - visit http://localhost:3001
 GET - /v1​/user​/self (Get User Information)
 PUT - ​/v1​/user​/self (Update user information)
 POST - /v1​/user (Create a user)
-
+POST - /v1/user/recipie/ (Create a Recipe)
+Get - /v1/user/recipie/:id (Get a Recipe)
+Put - /v1​/user/recpie/:id (Update a Recipe)
+Delete - /v1​/user/:id (Delete a Recipe)
 Install Postman to interact with REST API
 
 create user with 
