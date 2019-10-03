@@ -363,6 +363,13 @@ exports.deleteRecipe = function (req, res) {
     } else {
       if (results.length > 0) {
         if (bcrypt.compareSync(password, results[0].password)) {
+            connection.query('SELECT * FROM recipe  WHERE id = ?', recipeid, function (error, results, fields) {
+              if (error) {console.log("Bad Request", error);
+              res.send({
+                "code": 400,
+                "failed": "Bad Request"
+              })}else{
+                if (results.length > 0) {
           connection.query('Delete from orderlist where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
             console.log("hi i am here at orderlist");
 
@@ -404,6 +411,11 @@ exports.deleteRecipe = function (req, res) {
             }
 
           });
+        }else {
+          return res.status(400).send({ message: 'Bad Request' });
+
+        }
+        }});
         } else {
           return res.status(401).send({ message: 'Unauthorized' });
 
