@@ -25,11 +25,10 @@ cd ccwebapp/webapp
 
 npm install
 
-server.js
 
 ## Deploy Instructions
 
-
+npm start
 
 ## Routes
 
@@ -59,7 +58,7 @@ Body: raw + JSON (application/json)
 Body Content: {"firstname": "test", "lastname":"test", "password":"password"} 
 
 ## Running Tests
-
+mocha 
 
 ## CI/CD
 

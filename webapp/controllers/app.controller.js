@@ -70,12 +70,10 @@ exports.register = function(req,res){
     });
 
   };
-  
   exports.update = function(req,res){
+
     var today = new Date();
-
     var token = req.headers['authorization'];
-
     if (!token) return res.status(400).send({  message: 'Bad Request' });
 
     var tmp = token.split(' ');
@@ -90,17 +88,18 @@ exports.register = function(req,res){
     var parm = "";
     var insertParam =[];
     var keys = Object.keys(req.body);
+
     if (username==null || password==null) return res.status(400).send({ message: 'Bad Request' });
     
       connection.query('SELECT * FROM users WHERE email = ?',username, function (error, results, fields) {
           if (error) {
             return res.status(404).send({ message: 'Bad Request' });
+
           }else{
             if(results.length >0){
               if(bcrypt.compareSync(password,results[0].password) ){
                 console.log("-----------Updating----------------------")
                   for (var i = 0; i < keys.length; i++) {
-                              
                       parm = parm + keys[i]+"= ?, ";
                       if(keys[i]=="password"){
                         if(!schema.validate(req.body.password)){return res.status(400).send({"failed":"Bad Request, invalid Password"})};
