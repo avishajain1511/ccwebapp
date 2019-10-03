@@ -348,3 +348,296 @@ exports.deleteRecipe = function (req, res) {
 
 };
 
+
+
+exports.updateRecipe = function (req, res) {
+
+
+  var today = new Date();
+
+  var token = req.headers['authorization'];
+
+  if (!token) return res.status(401).send({ message: 'Unauthorized' });
+
+  var tmp = token.split(' ');
+  var buf = new Buffer(tmp[1], 'base64');
+  var plain_auth = buf.toString();
+  var creds = plain_auth.split(':');
+
+  var username = creds[0];
+  var password = creds[1];
+  console.log("Update creds" + username + " " + password)
+  var parm = "";
+  var nutritionparam = "";
+  var insertParam = [];
+  var insertNutritionParam = [];
+  var keys = Object.keys(req.body);
+  var nutritionKeys = Object.keys(req.body.nutrition_information)
+  if (username == null || password == null) return res.status(400).send({ message: 'Bad Request' });
+  var recipeid = req.params['id'];
+  var updateRecipieSql = "update recipe set "
+  var updateNutritionSql = "update NutritionInformation set ";
+  var ingredientsList1 = new Set;
+  var ingredients = [];
+  ingredients = req.body.ingredients;
+  var updateIngredients = false;
+  updateOrderlistBool = false;
+
+  if (!token) return res.status(400).send({ message: 'Bad Request' });
+
+  if (username == null || password == null) return res.status(400).send({ message: 'Bad Request, Password and Username cannot be null' });
+
+  console.log("Update creds" + username + " " + password)
+
+  if ((req.body.cook_time_in_min) == null || req.body.prep_time_in_min == null || (req.body.title) == null || (req.body.title).trim().length < 1 || (req.body.cusine).trim().length < 1 || (req.body.cusine) == null || req.body.servings == null
+    || req.body.ingredients == null || req.body.ingredients.length < 1 || req.body.steps == null || req.body.steps.length < 1
+    || req.body.nutrition_information == null || Object.keys(req.body.nutrition_information).length < 1
+    || req.body.nutrition_information.protein_in_grams == null || req.body.nutrition_information.calories == null || req.body.nutrition_information.cholesterol_in_mg == null
+    || req.body.nutrition_information.sodium_in_mg == null || req.body.nutrition_information.carbohydrates_in_grams == null) {
+
+    return res.status(400).send({
+      message: 'Bad Request, Feilds Cannot be null or Empty'
+    })
+  };
+
+  function isNumber(value) {
+    return typeof value === 'number' && isFinite(value);
+  }
+
+  function isInteger1(value) {
+    return !isNaN(value) && parseInt(value) == value && !isNaN(parseInt(value, 10)) && !(typeof value === 'string');
+  }
+
+  if (!isNumber(req.body.nutrition_information.protein_in_grams) || !isNumber(req.body.nutrition_information.cholesterol_in_mg) ||
+    !isNumber(req.body.nutrition_information.carbohydrates_in_grams) || !isInteger1(req.body.nutrition_information.calories) ||
+    !isInteger1(req.body.nutrition_information.sodium_in_mg)) {
+    return res.status(400).send({
+      message: 'Bad Request, Invalid nutrition_information.'
+    })
+  }
+  if (!(req.body.servings >= 1 && req.body.servings <= 5)) {
+    return res.status(400).send({
+      message: 'Bad Request, Valid Servings are from 1 to 5'
+    })
+  }
+  if (req.body.cook_time_in_min % 5 != 0 || req.body.prep_time_in_min % 5 != 0) { return res.status(400).send({ message: 'Bad Request, Time should be in multiple of 5' }) };
+
+  var a = [];
+  var stepsArry = req.body.steps;
+  for (var l = 0; l < stepsArry.length; l++) {
+    a.push(stepsArry[l].position);
+    a.sort();
+  }
+  if (a[0] != 1) {
+    return res.status(400).send({ message: 'Bad Request, Please enter the first step' });
+  }
+  if (stepsArry.length != a[stepsArry.length - 1] - a[0] + 1) {
+    return res.status(400).send({ message: 'Bad Request, Steps are not Consecutive' });
+  }
+
+  connection.query('SELECT * FROM users WHERE email= ?', username, function (error, results, fields) {
+    if (error) {
+      return res.status(404).send({ message: 'user  Not Found' });
+    } else {
+      if (results.length > 0) {
+        if (bcrypt.compareSync(password, results[0].password)) {
+          connection.query('SELECT * FROM recipe  WHERE id = ?', recipeid, function (error, results, fields) {
+            if (error) {
+              return res.status(404).send({ message: 'Recipe  Not Found' });
+            } else {
+              if (results.length > 0) {
+                console.log("-----------Updating----------------------")
+                for (var i = 0; i < keys.length; i++) {
+                  if (keys[i] == 'steps') {
+                    updateOrderlistBool = true;
+                  } else if (keys[i] == 'nutrition_information') {
+                    console.log("-----------nutr----------------------" + nutritionKeys[0])
+                    for (var j = 0; j < nutritionKeys.length; j++) {
+                      console.log(req.body.nutrition_information[nutritionKeys[j]])
+                      if (j != nutritionKeys.length - 1) {
+                        nutritionparam = nutritionparam + nutritionKeys[j] + "= ?, ";
+                      }
+                      else {
+                        nutritionparam = nutritionparam + nutritionKeys[j] + "= ? ";
+                      }
+                      insertNutritionParam.push(req.body.nutrition_information[nutritionKeys[j]]);
+                    }
+                  } else if (keys[i] == "ingredients") {
+                    // console.log("not null");
+                    updateIngredients = true;
+                  }
+                  else if (keys[i] != 'ingredients') {
+                    parm = parm + keys[i] + "= ?, ";
+                    insertParam.push(req.body[keys[i]]);
+                  }
+                }
+
+                if (updateOrderlistBool) {
+                  console.log("---------------updating steps")
+                  var stepList = req.body.steps;
+                  console.log("steps: " + stepList);
+                  // check if steps has atleast one object
+                  if (stepList.length > 5) {
+                    return res.status(400).send({ message: 'Bad Request, stepsList does not have an object' });
+                  }
+                  if (!(stepList.some(obj => typeof stepList[0] == 'object') || stepList.length < 5)) {
+                    return res.status(400).send({ message: 'Bad Request, stepsList does not have an object' });
+                  }
+                  var steps;
+                  // check if position has min 1
+                  connection.query('delete from orderlist where recipeTable_idrecipe=?', recipeid, function (error, result, fields) {
+                    if (error) {
+                      return res.send({
+                        "code": 400,
+                        "failed": "Bad Request"
+                      })
+                    } else {
+                      for (var i = 0; i < stepList.length; i++) {
+                        if (stepList[i].position < 1 || stepList[i].position > 5) {
+                          return res.status(400).send({ message: 'Bad Request, min 1 position required' });
+                        }
+                        steps = {
+                          position: stepList[i].position,
+                          item: stepList[i].items
+                        }
+                        var stepsid1 = uuidv1();
+                        var values = [stepsid1, recipeid, steps.position, steps.item]
+
+                        connection.query('insert into orderlist (id, recipeTable_idrecipe, position, items) values(?,?,?,?)', values, function (error, result, fields) {
+                          if (error) {
+                            console.log("Bad Request", error);
+                            return res.send({
+                              "code": 400,
+                              "failed": "Bad Request"
+                            })
+                          } else {
+                            console.log("created Succesfully");
+                          }
+
+                        })
+                      }
+                    }
+                  });
+
+                }
+
+                console.log("----Nutrition-----")
+                insertNutritionParam.push(recipeid)
+                console.log(updateIngredients);
+
+                var updateNutritionSqlQuery = updateNutritionSql + nutritionparam + " WHERE recipeTable_idrecipe = ?"
+                var updateresult = mysql.format(updateNutritionSqlQuery, insertNutritionParam);
+                console.log(updateresult)
+                connection.query(updateresult, function (error, result, fields) {
+                  if (error) {
+                    return res.status(400).send({ message: 'Bad Nutrion  Request' });
+                  } else {
+                    if (updateIngredients) {
+                      console.log("not null");
+
+                      ing = true;
+
+                      console.log(ingredients.length)
+
+                      for (var i = 0; i < ingredients.length; i++) {
+                        console.log("Item not there")
+                        ingredientsList1.add(ingredients[i]);
+                      }
+
+                      ingredients = Array.from(ingredientsList1);
+                      ingredients = "" + ingredients;
+                      console.log(ingredients);
+                      parm = parm + "ingredients" + "= ?, ";
+                      insertParam.push(ingredients);
+                      console.log(parm)
+                    }
+
+                    insertParam.push(today);
+                    insertParam.push(recipeid)
+                    var updateSqlQuery = updateRecipieSql + parm + "updated_ts =? WHERE id = ?"
+                    var updateresult = mysql.format(updateSqlQuery, insertParam);
+                    console.log(updateresult)
+                    connection.query(updateresult, function (error, result, fields) {
+                      if (error) {
+                        return res.status(400).send({ message: 'Bad sql  Request' });
+                      } else {
+                        var output;
+                        connection.query("SELECT  id, created_ts,updated_ts,author_id,cook_time_in_min,prep_time_in_min,total_time_in_min,title,cusine,servings,ingredients FROM recipe where id =?", recipeid, function (error, results, fields) {
+                          if (error) {
+                            return res.status(400).send({ message: 'Bad sql 1 Request' });
+                          } else {
+                            var ingredients = [];
+                            if (results.length > 0) {
+
+                              var ingredientsList = JSON.stringify(results[0]['ingredients']);
+                              console.log(ingredientsList);
+                              ingredientsList = ingredientsList.split(",")
+
+                              for (i in ingredientsList) {
+                                ingredients[i] = ingredientsList[i];
+                                console.log(ingredients)
+                                ingredients[i] = ingredientsList[i].replace(/[\\"\[\]]/g, '');
+
+                                console.log(ingredients[i]);
+                              }
+
+                              console.log(results[0]['steps']);
+                              console.log(results[0]);
+                              connection.query(' SELECT position, items from orderlist where recipeTable_idrecipe=? ', recipeid, function (error, results1, fields) {
+                                if (error) {
+                                  return res.status(400).send({ message: 'Bad sql Request' });
+                                } else {
+                                  console.log(results1)
+                                  if (results.length > 0) {
+                                    console.log("------------" + recipeid);
+                                    connection.query(' SELECT * from NutritionInformation where recipeTable_idrecipe=? ', recipeid, function (error, results2, fields) {
+                                      if (error) {
+                                        return res.status(400).send({ message: 'Bad nu Request' });
+                                      } else {
+                                        if (results2.length > 0) {
+                                          console.log("result------------" + results2.length);
+
+                                          output = results[0];
+                                          output['ingredients'] = ingredients
+                                          output['steps'] = results1
+                                          output['nutrition_information'] = results2[0]
+                                          console.log(results2);
+                                          res.send(output);
+
+                                        }
+                                        else {
+                                          return res.status(400).send({ message: 'Bad  Request, No Value for this id available in NutritionInformation' });
+                                        }
+                                      }
+                                    });
+                                  }
+                                  else {
+                                    return res.status(400).send({ message: 'Bad  Request, No Value for this id available in orderlist' });
+                                  }
+                                }
+                              });
+                            }
+                            else {
+                              return res.status(400).send({ message: 'Bad  Request, No Result Available in Recipe' });
+                            }
+                          }
+                        });
+                      }
+                    });
+                  }
+
+                });
+              }
+            }
+          });
+        } else {
+          return res.status(400).send({ message: 'Bad pass Request' });
+        }
+      }
+      else {
+        return res.status(400).send({ message: 'Bad  ung Request' });
+      }
+
+    }
+  });
+}
