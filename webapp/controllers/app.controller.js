@@ -187,7 +187,7 @@ exports.register = function(req,res){
                                 return res.status(404).send({ message: 'Bad Request' });
                         }
                         else{
-                            res.send(result);
+                            res.send(result[0]);
                         }
                     });
                 }

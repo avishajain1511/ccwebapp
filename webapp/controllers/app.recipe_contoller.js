@@ -352,7 +352,7 @@ exports.deleteRecipe = function (req, res) {
   var username = creds[0];
   var password = creds[1];
 
-
+  var userid="";
   if (username == null || password == null) {
     return res.status(400).send({ message: 'Bad Request, Authetication cannot be complete without eamil and password' });
   }
@@ -362,8 +362,12 @@ exports.deleteRecipe = function (req, res) {
       return res.status(404).send({ message: 'Not Found' });
     } else {
       if (results.length > 0) {
+        userid=results[0].id;
         if (bcrypt.compareSync(password, results[0].password)) {
-            connection.query('SELECT * FROM recipe  WHERE id = ?', recipeid, function (error, results, fields) {
+          var ins =[recipeid,userid]
+         var resultsSelectqlquerry = mysql.format('SELECT * FROM recipe where id= ? AND author_id=?', ins);
+         console.log("==========================="+resultsSelectqlquerry);
+            connection.query(resultsSelectqlquerry, function (error, results, fields) {
               if (error) {console.log("Bad Request", error);
               res.send({
                 "code": 400,
@@ -380,6 +384,7 @@ exports.deleteRecipe = function (req, res) {
                 "failed": "Bad Request"
               })
             } else {
+              
               connection.query('Delete from NutritionInformation where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
                 console.log("hi i am here at orderlist");
 
@@ -390,7 +395,10 @@ exports.deleteRecipe = function (req, res) {
                     "failed": "Bad Request"
                   })
                 } else {
-                  connection.query('Delete from recipe where id= ?', recipeid, function (error, results, fields) {
+                  console.log("author_id-----------"+userid)
+                  var ins =[recipeid]
+                 var resultsqlquerry = mysql.format('Delete from recipe where id= ?', ins);
+                  connection.query(resultsqlquerry,  function (error, results, fields) {
                     console.log("hi i am here at orderlist");
 
                     if (error) {
@@ -412,7 +420,7 @@ exports.deleteRecipe = function (req, res) {
 
           });
         }else {
-          return res.status(400).send({ message: 'Bad Request' });
+          return res.status(400).send({ message: 'Bad Request, no such recipe found in theis user' });
 
         }
         }});
@@ -512,14 +520,17 @@ exports.updateRecipe = function (req, res) {
   if (stepsArry.length != a[stepsArry.length - 1] - a[0] + 1) {
     return res.status(400).send({ message: 'Bad Request, Steps are not Consecutive' });
   }
-
+var userid="";
   connection.query('SELECT * FROM users WHERE email= ?', username, function (error, results, fields) {
     if (error) {
       return res.status(404).send({ message: 'user  Not Found' });
     } else {
       if (results.length > 0) {
         if (bcrypt.compareSync(password, results[0].password)) {
-          connection.query('SELECT * FROM recipe  WHERE id = ?', recipeid, function (error, results, fields) {
+          userid=results[0].id;
+          var ins =[recipeid,userid]
+         var resultsSelectqlquerry = mysql.format('SELECT * FROM recipe where id= ? AND author_id=?', ins);
+          connection.query(resultsSelectqlquerry, function (error, results, fields) {
             if (error) {
               return res.status(404).send({ message: 'Recipe  Not Found' });
             } else {
@@ -629,10 +640,11 @@ exports.updateRecipe = function (req, res) {
                       insertParam.push(ingredients);
                       console.log(parm)
                     }
-
+                    insertParam.push(req.body.cook_time_in_min+req.body.prep_time_in_min);
                     insertParam.push(today);
                     insertParam.push(recipeid)
-                    var updateSqlQuery = updateRecipieSql + parm + "updated_ts =? WHERE id = ?"
+                    insertParam.push(userid)
+                    var updateSqlQuery = updateRecipieSql + parm + "total_time_in_min=? , updated_ts =? WHERE id = ? and author_id=?"
                     var updateresult = mysql.format(updateSqlQuery, insertParam);
                     console.log(updateresult)
                     connection.query(updateresult, function (error, result, fields) {
