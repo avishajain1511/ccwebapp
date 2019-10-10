@@ -1,6 +1,11 @@
 # Folder of node js
 node_modules/
 
+# Folder of Teraforms
+terraform.tfstate
+terraform.tfstate.backup
+terraform.tfvars
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

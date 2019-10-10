@@ -1,6 +1,7 @@
 Readme.md
 # CSYE 6225 - Fall 2019
 
+
 ## Team Information
 
 | Name | NEU ID | Email Address |
@@ -65,4 +66,10 @@ mocha
 
 ## CI/CD
 
+## Infrastructure
 
+For Terraforms use 
+    Terraform apply
+    Terraform destroy
+
+Change the paramters in .tfvars file to make changes in VPC properties
