@@ -1,6 +1,5 @@
 
 resource "aws_vpc" "main" {
-  count=2
   cidr_block = "${var.vpcCidrBlock}"
 
   tags = {
