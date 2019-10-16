@@ -1,10 +1,10 @@
 echo "Enter Stack Name. !!Make sure the stack name does not exists already!!"
-read StackName
+StackName=$1
 echo "Your Current profile"
 echo $AWS_PROFILE
 echo "Supported Profiles : dev, prod"
 echo "Enter the Profile to use"
-read "profile"
+profile=$2
 AWS_PROFILE=$profile
 
 if [[ "$AWS_PROFILE" = "dev" ]];then
@@ -20,7 +20,7 @@ else
 fi
 
 echo "Enter the Region. Ex: us-east-1"
-read "region"
+region=$3
 if [ "$region" = "$AWS_DEFAULT_REGION" ];then
   echo "valid region : "
   export AWS_DEFAULT_REGION="$region"
@@ -35,13 +35,13 @@ else
 fi
 
 echo "Enter subnet cidrblock 1. Ex : 10.0.1.0/24"
-read CidrBlock1
+CidrBlock1=$4
 echo "Enter subnet cidrblock 2. Ex : 10.0.2.0/24"
-read CidrBlock2
+CidrBlock2=$5
 echo "Enter subnet cidrblock 3. Ex : 10.0.3.0/24"
-read CidrBlock3
+CidrBlock3=$6
 echo "Enter vpc cidrblock.. Ex : 10.0.0.0/16"
-read VPCCidrBlock
+VPCCidrBlock=$7
 echo "Received Subnets. Validating template"
 SUBNETREGEX="^([0-9]{1,3}\\.){3}[0-9]{1,3}[\/]{1}([0-9]|[2][4])?$"
 REGEX="^([0-9]{1,3}\\.){3}[0-9]{1,3}[\/]{1}([0-9]|[1][6])?$"

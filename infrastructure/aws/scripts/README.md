@@ -1,37 +1,21 @@
 Commands:
 
 To create a VPC:
-./csye6225-aws-cf-create-stack.sh
+./csye6225-aws-networking-setup.sh dev us-east-1 myvpc 10.0.0.0/16 10.0.1.0/24 10.0.2.0/24 10.0.3.0/24
+
+./csye6225-aws-networking-setup.sh prod us-east-2 myvpc 10.0.0.0/16 10.0.1.0/24 10.0.2.0/24 10.0.3.0/24
 
 To delete a VPC:
 ./csye6225-aws-cf-terminate-stack.sh
+
+./csye6225-aws-networking-teardown.sh "profile-name" "region"
+ex. - ./csye6225-aws-networking-teardown.sh dev us-east-1
 
 Example:
 
 Your Current profile
 dev
 Supported Profiles : dev, prod
-Enter the Profile to use
-dev
-Enter the Region. Ex: us-east-1
-us-east-1
-valid region : 
-Enter VPC Name
-vpcname: any string for valid name
-Enter VPC cidr block
-Ex: 10.0.0.0/16 
-Enter subnet name 1
-subnet name: any string for valid name
-Enter subnet cidrblock 1. Ex : 10.0.1.0/24
-10.0.1.0/24
-Enter subnet name 2
-subnet name: any string for valid name
-Enter subnet cidrblock 2. Ex : 10.0.1.0/24
-10.0.2.0/24
-Enter subnet name 3
-subnet name: any string for valid name
-Enter subnet cidrblock 3. Ex : 10.0.1.0/24
-10.0.3.0/24
 
 Creating VPC
 Creating InternetGateway

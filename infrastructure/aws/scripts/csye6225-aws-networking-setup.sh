@@ -2,7 +2,7 @@ STACK_NAME=$1
 echo "Your Current profile"
 echo $AWS_PROFILE
 echo "Enter the Profile to use"
-read "profile"
+profile=$1
 AWS_PROFILE=$profile
 
 if [[ "$AWS_PROFILE" = "dev" ]];then
@@ -20,7 +20,7 @@ fi
 
 
 echo "Enter the Region"
-read "region"
+region=$2
 if [ "$region" = "$AWS_DEFAULT_REGION" ];then
   echo "valid region : "
   export AWS_DEFAULT_REGION="$region"
@@ -34,9 +34,9 @@ fi
 
 
 echo "Enter VPC Name"
-read "vpcname"
+vpcname=$3
 echo "Enter VPC cidr block"
-read "vpccidrblock"
+vpccidrblock=$4
 REGEX="^([0-9]{1,3}\\.){3}[0-9]{1,3}[\/]{1}([0-9]|[1][6])?$"
 SUBNETREGEX="^([0-9]{1,3}\\.){3}[0-9]{1,3}[\/]{1}([0-9]|[2][4])?$"
 
@@ -49,11 +49,8 @@ else
 fi
 
 # echo "Creating Subnet1"
-echo "Creating Subnet1"
-echo "Enter subnet1 Name"
-read "subnet1_name1"
 echo "Enter CIDR block details for subnet1"
-read "subnet1_cidr1"
+subnet1_cidr1=$5
 echo "Enter availability zone"
 subnet1_az1="$AWS_DEFAULT_REGION"a
 echo $subnet1_az1
@@ -67,10 +64,8 @@ fi
 
 
 # echo "Creating Subnet2"
-echo "Enter subnet2 Name"
-read "subnet2_name2"
 echo "Enter CIDR block details for subnet2"
-read "subnet2_cidr2"
+subnet2_cidr2=$6
 echo "Enter availability zone"
 subnet2_az2="$AWS_DEFAULT_REGION"b
 echo $subnet2_az2
@@ -83,10 +78,8 @@ else
 fi
 
 # echo "Creating Subnet3"
-echo "Enter subnet3 Name"
-read "subnet3_name3"
 echo "Enter CIDR block details for subnet3"
-read "subnet3_cidr3"
+subnet3_cidr3=$7
 echo "Enter availability zone"
 subnet3_az3="$AWS_DEFAULT_REGION"c
 echo $subnet3_az3
