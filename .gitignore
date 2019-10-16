@@ -5,6 +5,7 @@ node_modules/
 terraform.tfstate
 terraform.tfstate.backup
 terraform.tfvars
+.terraform
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
