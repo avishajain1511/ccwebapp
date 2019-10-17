@@ -1,7 +1,7 @@
 echo "Your Current profile"
 echo $AWS_PROFILE
 echo "Enter the Profile to use"
-read "profile"
+profile=$1
 AWS_PROFILE=$profile
 
 if [[ "$AWS_PROFILE" = "dev" ]];then
@@ -18,7 +18,7 @@ fi
 
 
 echo "Enter the Region"
-read "region"
+region=$2
 if [ "$region" = "$AWS_DEFAULT_REGION" ];then
   echo "valid region : "
   export AWS_DEFAULT_REGION="$region"
@@ -132,5 +132,5 @@ fi
 		echo "Error deleting VPC. Exiting Script."
 		exit 1
 	}
-
+        
 	echo "*Done!*"	

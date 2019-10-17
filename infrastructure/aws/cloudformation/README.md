@@ -2,9 +2,13 @@ Commands:
 
 To create a VPC:
 ./csye6225-aws-cf-create-stack.sh
+./csye6225-aws-cf-create-stack.sh mystack dev us-east-1 10.0.4.0/24 10.0.5.0/24 10.0.6.0/24 10.0.0.0/16
 
 To delete a VPC:
 ./csye6225-aws-cf-terminate-stack.sh
+
+./csye6225-aws-cf-terminate-stack.sh "stackName" "profile" "region"
+./csye6225-aws-cf-terminate-stack.sh mystack dev us-east-1
 
 Example:
 

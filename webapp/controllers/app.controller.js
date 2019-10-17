@@ -101,12 +101,13 @@ exports.register = function(req,res){
                 console.log("-----------Updating----------------------")
                   for (var i = 0; i < keys.length; i++) {
                       parm = parm + keys[i]+"= ?, ";
+                      
                       if(keys[i]=="password"){
                         if(!schema.validate(req.body.password)){return res.status(400).send({"failed":"Bad Request, invalid Password"})};
                           var salt = bcrypt.genSaltSync(10);
                           var hash = bcrypt.hashSync(req.body[keys[i]], salt);
                           insertParam.push(hash);
-                        }else{
+                        }else if(keys[i]=="firstname" || keys[i]=="lastname"){
                             if((req.body[keys[i]]).trim().length<1){ return res.status(400).send({"failed":"Bad Request, feilds Cannot be empty"})};
                             insertParam.push(req.body[keys[i]]);
                         }

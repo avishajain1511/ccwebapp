@@ -327,7 +327,7 @@ exports.getRecipe = function (req, res) {
         });
       }
       else {
-        return res.status(400).send({ message: 'Bad  Request, No Result Available in Recipe' });
+        return res.status(401).send({ message: 'Unautherized' });
       }
     }
   });
@@ -420,7 +420,7 @@ exports.deleteRecipe = function (req, res) {
 
           });
         }else {
-          return res.status(400).send({ message: 'Bad Request, no such recipe found in theis user' });
+          return res.status(401).send({ message: 'Unauthorized' });
 
         }
         }});
@@ -719,12 +719,12 @@ var userid="";
                 });
               }
               else {
-                return res.status(400).send({ message: 'Bad  Request, Recipe not found' });
+                return res.status(401).send({ message: 'Unauthorized' });
               }
             }
           });
         } else { 
-          return res.status(404).send({ message: 'Unauthorized' });
+          return res.status(401).send({ message: 'Unauthorized' });
         }
       }
       else {

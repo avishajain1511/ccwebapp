@@ -159,8 +159,16 @@
                 }
             }
         },
+        "LinkGatewayVPC" : {
+            "Type" :"AWS::EC2::VPCGatewayAttachment",
+            "Properties" :{
+                "InternetGatewayId" : {"Ref":"InternetGateway"},
+                "VpcId" : {"Ref":"VPC"}
+            }
+        },
         "PublicInternetRoute": {
             "Type": "AWS::EC2::Route",
+            "DependsOn" : "LinkGatewayVPC",
             "Properties": {
                 "DestinationCidrBlock": "0.0.0.0/0",
                 "RouteTableId": {
