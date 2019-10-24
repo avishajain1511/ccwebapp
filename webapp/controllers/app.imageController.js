@@ -196,10 +196,11 @@ console.log(username)
     var ins = [recipeid, userid]
     var resultsSelectqlquerry = mysql.format('SELECT * FROM recipe where id= ? AND author_id=?', ins);
     connection.query(resultsSelectqlquerry, function (error, results, fields) {
+      console.log(results[0])
       if (error) {
         return res.status(404).send({ message: 'Recipe  Not Found' });
       }
-      if (results.length < 0) {
+      if (results.length < 0 || typeof results[0] === 'undefined') {
 
         return res.status(404).send({ message: 'Not Found, Recipe not found for this user' });
       }
