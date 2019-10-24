@@ -5,7 +5,7 @@ const uuidv1 = require('uuid/v1');
 
 exports.registerRecipe = function (req, res) {
   var token = req.headers['authorization'];
-  if (!token) return res.status(400).send({ message: 'Bad Request,' });
+  if (!token) return res.status(401).send({ message: 'No authorization token' });
 
  
 
@@ -60,7 +60,7 @@ exports.registerRecipe = function (req, res) {
 
   connection.query('SELECT * FROM users WHERE email = ?', username, function (error, results, fields) {
     if (error) {
-      return res.status(400).send({ message: 'Bad Request' });
+      return res.status(404).send({ message: 'User not found' });
     } else {
       if (results.length > 0) {
         if (bcrypt.compareSync(password, results[0].password)) {
@@ -99,7 +99,7 @@ exports.registerRecipe = function (req, res) {
           connection.query('SELECT * FROM users WHERE email = ?', username, function (error, result, fields) {
 
             if (error) {
-              return res.status(400).send({ message: 'Bad Request, cannot find user' });
+              return res.status(404).send({ message: 'User not found' });
             } else {
               var author = [];
               console.log(result[0]['id']);
@@ -187,7 +187,7 @@ exports.registerRecipe = function (req, res) {
                         var output;
                         connection.query("SELECT  id, created_ts,updated_ts,author_id,cook_time_in_min,prep_time_in_min,total_time_in_min,title,cusine,servings,ingredients FROM recipe where id =?", recipeid, function (error, results, fields) {
                           if (error) {
-                            return res.status(400).send({ message: 'Bad sql 1 Request' });
+                            return res.status(404).send({ message: 'Recipe data not found' });
                           } else {
                             var ingredients = [];
                             if (results.length > 0) {
@@ -208,14 +208,14 @@ exports.registerRecipe = function (req, res) {
                               console.log(results[0]);
                               connection.query(' SELECT position, items from orderlist where recipeTable_idrecipe=? ', recipeid, function (error, results1, fields) {
                                 if (error) {
-                                  return res.status(400).send({ message: 'Bad sql Request' });
+                                  return res.status(404).send({ message: 'Orderlist data Not found' });
                                 } else {
                                   console.log(results1)
                                   if (results.length > 0) {
                                     console.log("------------" + recipeid);
                                     connection.query(' SELECT calories,cholesterol_in_mg,sodium_in_mg,carbohydrates_in_grams,protein_in_grams from NutritionInformation where recipeTable_idrecipe=? ', recipeid, function (error, results2, fields) {
                                       if (error) {
-                                        return res.status(400).send({ message: 'Bad nu Request' });
+                                        return res.status(404).send({ message: 'Nutrition data not found' });
                                       } else {
                                         if (results2.length > 0) {
                                           console.log("result------------" + results2.length);
@@ -229,19 +229,19 @@ exports.registerRecipe = function (req, res) {
 
                                         }
                                         else {
-                                          return res.status(400).send({ message: 'Bad n Request' });
+                                          return res.status(404).send({ message: 'Nutrition not found' });
                                         }
                                       }
                                     });
                                   }
                                   else {
-                                    return res.status(400).send({ message: 'Bad n2 Request' });
+                                    return res.status(404).send({ message: 'Orderlist Not found' });
                                   }
                                 }
                               });
                             }
                             else {
-                              return res.status(400).send({ message: 'No Result Available' });
+                              return res.status(404).send({ message: 'Recipe Not found' });
                             }
                           }
                         });
@@ -273,7 +273,7 @@ exports.getRecipe = function (req, res) {
   var output;
   connection.query("SELECT  id, created_ts,updated_ts,author_id,cook_time_in_min,prep_time_in_min,total_time_in_min,title,cusine,servings,ingredients FROM recipe where id =?", recipeid, function (error, results, fields) {
     if (error) {
-      return res.status(400).send({ message: 'Bad  Request' });
+      return res.status(404).send({ message: 'Recipe Not Found' });
     } else {
       var ingredients = [];
       if (results.length > 0) {
@@ -294,14 +294,14 @@ exports.getRecipe = function (req, res) {
         console.log(results[0]);
         connection.query(' SELECT position, items from orderlist where recipeTable_idrecipe=? ', recipeid, function (error, results1, fields) {
           if (error) {
-            return res.status(400).send({ message: 'Bad Request' });
+            return res.status(404).send({ message: 'Orderlist Data Not Found' });
           } else {
             console.log(results1)
             if (results.length > 0) {
               console.log("------------" + recipeid);
               connection.query(' SELECT calories,cholesterol_in_mg,sodium_in_mg,carbohydrates_in_grams,protein_in_grams from NutritionInformation where recipeTable_idrecipe=? ', recipeid, function (error, results2, fields) {
                 if (error) {
-                  return res.status(400).send({ message: 'Bad Request' });
+                  return res.status(404).send({ message: 'Nutrition Data Not Found' });
                 } else {
                   if (results2.length > 0) {
                     console.log("result------------" + results2.length);
@@ -359,7 +359,7 @@ exports.deleteRecipe = function (req, res) {
   console.log("user" + username, "password " + password);
   connection.query('SELECT * FROM users WHERE email = ?', username, function (error, results, fields) {
     if (error) {
-      return res.status(404).send({ message: 'Not Found' });
+      return res.status(404).send({ message: 'User Not Found' });
     } else {
       if (results.length > 0) {
         userid=results[0].id;
@@ -370,8 +370,8 @@ exports.deleteRecipe = function (req, res) {
             connection.query(resultsSelectqlquerry, function (error, results, fields) {
               if (error) {console.log("Bad Request", error);
               res.send({
-                "code": 400,
-                "failed": "Bad Request"
+                "code": 404,
+                "failed": "Not Found"
               })}else{
                 if (results.length > 0) {
           connection.query('Delete from orderlist where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
@@ -380,8 +380,8 @@ exports.deleteRecipe = function (req, res) {
             if (error) {
               console.log("Bad Request", error);
               res.send({
-                "code": 400,
-                "failed": "Bad Request"
+                "code": 404,
+                "failed": "Not Found"
               })
             } else {
               
@@ -389,10 +389,10 @@ exports.deleteRecipe = function (req, res) {
                 console.log("hi i am here at orderlist");
 
                 if (error) {
-                  console.log("Bad Request", error);
+                  console.log("Not Found", error);
                   res.send({
-                    "code": 400,
-                    "failed": "Bad Request"
+                    "code": 404,
+                    "failed": "Not Found"
                   })
                 } else {
                   console.log("author_id-----------"+userid)
@@ -404,8 +404,8 @@ exports.deleteRecipe = function (req, res) {
                     if (error) {
                       console.log("Bad Request", error);
                       return res.send({
-                        "code": 400,
-                        "failed": "Bad Request"
+                        "code": 404,
+                        "failed": "Not Found"
                       })
                     } else {
                       res.status(204).send({ message: "No Content" });
@@ -420,7 +420,7 @@ exports.deleteRecipe = function (req, res) {
 
           });
         }else {
-          return res.status(401).send({ message: 'Unauthorized' });
+          return res.status(400).send({ message: 'Bad Request' });
 
         }
         }});
@@ -436,6 +436,7 @@ exports.deleteRecipe = function (req, res) {
 
 
 };
+
 exports.updateRecipe = function (req, res) {
 
 
@@ -461,15 +462,13 @@ exports.updateRecipe = function (req, res) {
   var nutritionKeys = Object.keys(req.body.nutrition_information)
   if (username == null || password == null) return res.status(400).send({ message: 'Bad Request' });
   var recipeid = req.params['id'];
-  var updateRecipieSql = "update recipe set "
+  var updateRecipeSql = "update recipe set "
   var updateNutritionSql = "update NutritionInformation set ";
   var ingredientsList1 = new Set;
   var ingredients = [];
   ingredients = req.body.ingredients;
   var updateIngredients = false;
   updateOrderlistBool = false;
-
-  if (!token) return res.status(400).send({ message: 'Bad Request' });
 
   if (username == null || password == null) return res.status(400).send({ message: 'Bad Request, Password and Username cannot be null' });
 
@@ -649,12 +648,12 @@ var userid="";
                     console.log(updateresult)
                     connection.query(updateresult, function (error, result, fields) {
                       if (error) {
-                        return res.status(400).send({ message: 'Bad sql  Request' });
+                        return res.status(400).send({ message: 'Bad Request, ingredient data' });
                       } else {
                         var output;
                         connection.query("SELECT  id, created_ts,updated_ts,author_id,cook_time_in_min,prep_time_in_min,total_time_in_min,title,cusine,servings,ingredients FROM recipe where id =?", recipeid, function (error, results, fields) {
                           if (error) {
-                            return res.status(400).send({ message: 'Bad sql 1 Request' });
+                            return res.status(400).send({ message: 'Bad Request, recipe data' });
                           } else {
                             var ingredients = [];
                             if (results.length > 0) {
@@ -675,14 +674,14 @@ var userid="";
                               console.log(results[0]);
                               connection.query(' SELECT position, items from orderlist where recipeTable_idrecipe=? ', recipeid, function (error, results1, fields) {
                                 if (error) {
-                                  return res.status(400).send({ message: 'Bad sql Request' });
+                                  return res.status(400).send({ message: 'Bad Request order data' });
                                 } else {
                                   console.log(results1)
                                   if (results.length > 0) {
                                     console.log("------------" + recipeid);
                                     connection.query(' SELECT calories,cholesterol_in_mg,sodium_in_mg,carbohydrates_in_grams,protein_in_grams from NutritionInformation where recipeTable_idrecipe=? ', recipeid, function (error, results2, fields) {
                                       if (error) {
-                                        return res.status(400).send({ message: 'Bad nu Request' });
+                                        return res.status(400).send({ message: 'Bad Request, nutrition data' });
                                       } else {
                                         if (results2.length > 0) {
                                           console.log("result------------" + results2.length);
@@ -719,7 +718,7 @@ var userid="";
                 });
               }
               else {
-                return res.status(401).send({ message: 'Unauthorized' });
+                return res.status(404).send({ message: 'Bad Request' });
               }
             }
           });

@@ -1,11 +1,12 @@
 // connecting to database
 
 var mysql = require('mysql');
+require('dotenv').config()
 
 var con = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "Master@123",
+  host: process.env.host,
+  user: "dbuser",
+  password: "Master123",
   database: "mydb"
 });
 
@@ -34,7 +35,7 @@ con.connect(function(err) {
     "`ingredients` varchar(255)  COLLATE utf8_unicode_ci NOT NULL," +
     "PRIMARY KEY (id)" +
     ") ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;";
-  var NutritionInformationsql = " CREATE TABLE IF NOT EXISTS `mydb`.`NutritionInformation` " +
+    var NutritionInformationsql = " CREATE TABLE IF NOT EXISTS `mydb`.`NutritionInformation` " +
     "(" +
     " `id`  varchar(100) NOT NULL," +
     "`calories` int(11)," +
@@ -46,7 +47,21 @@ con.connect(function(err) {
     "FOREIGN KEY (recipeTable_idrecipe) REFERENCES `recipe`(`id`)," +
     " PRIMARY KEY (id)" +
     ")ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci; ";
-
+    var Imagesql = " CREATE TABLE IF NOT EXISTS `mydb`.`Images` " +
+    "(" +
+    " `id`  varchar(100) NOT NULL," +
+    "`url` VARCHAR(100) NOT NULL," +
+    "`imageName` VARCHAR(254) NOT NULL," +
+    "`AcceptRanges` VARCHAR(254) NOT NULL," +
+    "`LastModified` VARCHAR(254) NOT NULL," +
+    "`ContentLength` VARCHAR(254) NOT NULL," +
+    "`ETag` VARCHAR(254) NOT NULL," +
+    "`ContentType` VARCHAR(254) NOT NULL," +
+    "`recipeTable_idrecipe` VARCHAR(100) NOT NULL," +
+    "FOREIGN KEY (recipeTable_idrecipe) REFERENCES `recipe`(`id`)," +
+    " PRIMARY KEY (id)" +
+    ")ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci; ";
+console.log(Imagesql)
   var orderlistSql = " CREATE TABLE IF NOT EXISTS `mydb`.`orderlist` (`id`  varchar(100)  NOT NULL ,`position` int(11) NOT NULL,`items` varchar(255) NOT NULL,`recipeTable_idrecipe` VARCHAR(100) NOT NULL, FOREIGN KEY (recipeTable_idrecipe) REFERENCES `recipe`(`id`),PRIMARY KEY (id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
   console.log(userSql);
   con.query(userSql, function (err, result) {
@@ -65,5 +80,9 @@ con.connect(function(err) {
     if (err) console.log("allready exist");
     console.log("Table 3 created");
   });
+  con.query(Imagesql, function (err, result) {
+    if (err) console.log("allready exist");
+    console.log("Table 5 created");
+          });
 });
 module.exports= con;

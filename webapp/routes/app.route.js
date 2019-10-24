@@ -1,18 +1,28 @@
 const express=require('express');
 const router = express.Router();
+var multer  = require('multer')
+var upload = multer({ dest: 'uploads/',errorHandling: 'manual' })
+multerS3 = require('multer-s3');
+const aws = require('aws-sdk');
 
 const app_controller = require('../controllers/app.controller');
 const recipie_controller = require('../controllers/app.recipe_contoller');
-// routes for creating, updating and getting user information
+const recipeImage_controller=require('../controllers/app.imageController')
 
 router.post('/user', app_controller.register);
 router.get('/user/self' , app_controller.login);
 router.put('/user/self', app_controller.update);
-router.post('/user/recipie',recipie_controller.registerRecipe)    
-router.get('/user/recipie/:id',recipie_controller.getRecipe)    
-router.delete('/user/recipie/:id',recipie_controller.deleteRecipe)    
-router.put('/user/recipie/:id',recipie_controller.updateRecipe)     
+router.post('/user/recipe',recipie_controller.registerRecipe)    
+router.get('/user/recipe/:id',recipie_controller.getRecipe)    
+router.delete('/user/recipe/:id',recipie_controller.deleteRecipe)    
+router.put('/user/recipe/:id',recipie_controller.updateRecipe)     
     
-
+router.post('/user/recipe/:recipeId/image', upload.single('imageUpload'), function (err, req, res, next) {
+    console.error(err.stack)
+    res.status(400).send({meesage:'Bad Request ,Formdata is not correct! use imageUpload as key'})
+  }
+  ,recipeImage_controller.addRecipeImage)
+router.get('/recipe/:recipeId/image/:imageId',recipeImage_controller.getRecipeImage)
+router.delete('/recipe/:recipeId/image/:imageId',recipeImage_controller.deleteRecipeImage)
 module.exports=router;
 
