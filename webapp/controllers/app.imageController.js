@@ -66,7 +66,7 @@ exports.addRecipeImage = function (req, res, next) {
         connection.query(result, function (error, result, fields) {
           if (error) {
             console.log(error);
-            return res.status(404).send({ message: 'Npt' });
+            return res.status(404).send({ message: 'Content not found' });
           } 
           var count = result[0].Count;
           console.log("------------" + count)
@@ -148,13 +148,13 @@ console.log("hi")
       return res.status(400).send({ message: 'Bad Request' });
     }
     if (results.length < 0 || typeof results[0] === 'undefined') {
-      return res.status(404).send({ message: 'Not Found, user not found' });
+      return res.status(404).send({ message: 'Not Found, Image not found' });
 
     }
     else {
       var param1 = { Bucket: process.env.bucket, Key: imageid};
             s3.getObject(param1, function(err, data) {
-              if (err)  return res.status(404).send({ message: 'Not Found, user not found' });
+              if (err)  return res.status(404).send({ message: 'Not Found, image not found' });
               // an error occurred
             });
       res.status(201).send({ 
