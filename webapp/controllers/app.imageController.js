@@ -51,7 +51,7 @@ exports.addRecipeImage = function (req, res, next) {
       if (error) {
         return res.status(404).send({ message: 'Recipe not found' });
       }
-      if (results.length < 0) {
+      if (results.length < 0 || typeof results[0] === 'undefined') {
 
         return res.status(404).send({ message: 'Not Found, Recipe not found for this user' });
       }
@@ -198,7 +198,7 @@ console.log(username)
     connection.query(resultsSelectqlquerry, function (error, results, fields) {
       console.log(results[0])
       if (error) {
-        return res.status(404).send({ message: 'Recipe  Not Found' });
+        return res.status(401).send({ message: 'Unauthorized' });
       }
       if (results.length < 0 || typeof results[0] === 'undefined') {
 
@@ -206,10 +206,14 @@ console.log(username)
       }
       else {
         console.log("----")
-        var selectSql = "SELECT count(imageName) AS Count,url,imageName,id  FROM Images WHERE id = ?";
-        var insert = [imageId];
+        var selectSql = "SELECT count(imageName) AS Count,url,imageName,id  FROM Images WHERE id = ? AND recipeTable_idrecipe=?";
+        var insert = [imageId,recipeid];
         var result = mysql.format(selectSql, insert);
         connection.query(result, function (error, result, fields) {
+          if(error){
+            return res.status(404).send({ message: 'Not Found, Image doesnot exist' });
+
+          }
           var count = result[0].Count;
           console.log("------------" + count)
           if (count < 1) {
