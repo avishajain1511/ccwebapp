@@ -38,7 +38,7 @@ jobs:
             pwd
             ls -al
       - run:
-          name: Upload Artifact to S3
+          name: Upload Artifact to the S3
           command: |
             aws s3 cp codedeploy_artifact/csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://${S3_BUCKET_ADDR}/deployments/csye6225-web-app-${CIRCLE_BUILD_NUM}.zip
 
