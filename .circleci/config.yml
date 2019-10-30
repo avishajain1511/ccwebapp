@@ -8,7 +8,7 @@ jobs:
       - checkout
 
       - run:
-          name: Greeting
+          name: Greetin
           command: echo Hello, world.
 
       - run:
