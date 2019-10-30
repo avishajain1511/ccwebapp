@@ -34,7 +34,6 @@ npm start
 ## Routes
 
 Routes - visit http://localhost:3001
-
 GET - /v1​/user​/self (Get User Information)
 PUT - ​/v1​/user​/self (Update user information)
 POST - /v1​/user (Create a user)
