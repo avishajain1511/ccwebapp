@@ -26,6 +26,7 @@ jobs:
             aws configure set default.region us-east-1
             pwd
             ls -al
+	    ls -la
             mkdir -p codedeploy_artifact
             cp infrastructure/aws/codedeploy/*.sh .
             zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp *.sh *.yml
