@@ -16,7 +16,7 @@ jobs:
           name: Install MySQL CLI; Import dummy data; run an example query
           command: |
             sudo apt-get install mysql-client
-             mysql -h 127.0.0.1 -u dbuser Master123 mydb  --execute="show databases"
+             mysql -h 127.0.0.1 -u dbuser Master123 mydb 
       - run:
           name: Install packages
           command: sudo apt update && sudo apt install wget zip unzip python2.7 python-pip -y 
