@@ -28,6 +28,7 @@ jobs:
             pwd
             ls -al
             npm install
+            npm install -g mocha
             mocha
 
       - run:
