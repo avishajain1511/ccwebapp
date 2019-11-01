@@ -5,7 +5,6 @@ jobs:
       - image: circleci/python:2.7-jessie
       - image: circleci/mysql:8.0.4
         environment:
-           MYSQL_HOST: '127.0.0.1'
           MYSQL_DATABASE: mydb
           MYSQL_USER: dbuser
           MYSQL_PASSWORD: Master123
@@ -15,9 +14,6 @@ jobs:
           name: Install MySQL CLI; Import dummy data; run an example query
           command: |
             sudo apt-get install mysql-client
-      - run:
-          name: Wait for db
-          command: dockerize -wait tcp://localhost:3306 -timeout 1m
       - run:
           name: Install packages
           command: sudo apt update && sudo apt install wget zip unzip python2.7 python-pip -y 
