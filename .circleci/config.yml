@@ -28,7 +28,7 @@ jobs:
             pwd
             ls -al
             npm install
-            sudo chown -R circleci /usr/local/lib/node_modules
+            sudo chown -R circleci /usr/lib/node_modules
             npm install -g mocha
             mocha
 
