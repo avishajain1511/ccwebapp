@@ -27,9 +27,9 @@ jobs:
             cd webapp
             pwd
             ls -al
-            npm install
+            sudo install
             sudo chown -R circleci /usr/lib/node_modules
-            npm install -g mocha
+            sudo npm install -g mocha
             mocha
 
       - run:
