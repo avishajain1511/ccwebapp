@@ -1,5 +1,5 @@
 # version: 0.0
-# os: linux
+# os: centos
 
 # files:             
 #   - source: ./webapp/build/libs/ROOT.war

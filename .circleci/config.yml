@@ -21,6 +21,8 @@ jobs:
             cd webapp
             pwd
             ls -al
+            npm install
+            mocha
 
       - run:
           name: Zip Artifact
