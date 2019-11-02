@@ -14,7 +14,7 @@ jobs:
       - checkout
 
       - run:
-          name: Wait for db
+          name: Wait for database
           command: dockerize -wait tcp://localhost:3306 -timeout 1m
 
 
