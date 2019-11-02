@@ -1,9 +1,9 @@
 version: 0.0
 os: linux
 
-# files:             
-#   - source: ./webapp/build/libs/ROOT.war
-#     destination: /opt/tomcat/webapps
+ files:             
+   - source: ./webapp
+     destination: /home/centos/webapp
 
 # hooks:
 #   AfterInstall:
