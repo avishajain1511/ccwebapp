@@ -4,19 +4,6 @@ jobs:
     docker:
       - image: circleci/python:2.7-jessie
       - image: circleci/mysql:8.0.4
-        environment:
-          MYSQL_ROOT_PASSWORD: Master123
-          MYSQL_DATABASE: mydb
-          MYSQL_USER: dbuser
-          MYSQL_PASSWORD: Master123
-          MYSQL_ROOT_HOST: 127.0.0.1
-    steps:
-      - checkout
-
-      - run:
-          name: Wait for db
-          command: dockerize -wait tcp://localhost:3306 -timeout 1m
-
 
       - run:
           name: Install packages
@@ -42,6 +29,7 @@ jobs:
             npm install
             sudo chown -R circleci /usr/lib/node_modules
             sudo npm install -g mocha
+            mocha
 
       - run:
           name: Zip Artifact
