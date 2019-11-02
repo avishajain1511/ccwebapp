@@ -1,9 +1,9 @@
 version: 0.0
 os: linux
 
-#  files:             
-#    - source: ./webapp
-#      destination: /home/centos
+files:
+  - source: ./webapp
+    destination: /home/centos
 
 # hooks:
 #   AfterInstall:
