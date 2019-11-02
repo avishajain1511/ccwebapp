@@ -3,7 +3,7 @@ os: linux
 
 files:
   - source: ./webapp
-    destination: /home/centos/Webapp
+    destination: /home/centos/webapp
 
 # hooks:
 #   AfterInstall:

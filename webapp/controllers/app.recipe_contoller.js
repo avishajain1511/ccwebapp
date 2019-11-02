@@ -7,7 +7,7 @@ exports.registerRecipe = function (req, res) {
   var token = req.headers['authorization'];
   if (!token) return res.status(401).send({ message: 'No authorization token' });
 
- 
+ console.log("secretAccessKey")
 
   if ((req.body.cook_time_in_min) == null || req.body.prep_time_in_min == null || (req.body.title) == null || (req.body.title).trim().length < 1 || (req.body.cusine).trim().length < 1 || (req.body.cusine) == null || req.body.servings == null
     || req.body.ingredients == null || req.body.ingredients.length < 1 || req.body.steps == null || req.body.steps.length < 1
