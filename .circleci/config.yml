@@ -3,7 +3,9 @@ jobs:
   build:
     docker:
       - image: circleci/python:2.7-jessie
-      - image: circleci/mysql:8.0.4
+
+    steps:
+      - checkout
 
       - run:
           name: Install packages
@@ -29,7 +31,6 @@ jobs:
             npm install
             sudo chown -R circleci /usr/lib/node_modules
             sudo npm install -g mocha
-            mocha
 
       - run:
           name: Zip Artifact
