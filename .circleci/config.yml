@@ -7,6 +7,9 @@ jobs:
     steps:
       - checkout
 
+      - run-tests:
+          context: dev
+
       - run:
           name: Install packages
           command: sudo apt update && sudo apt install wget zip unzip python2.7 python-pip -y 
