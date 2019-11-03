@@ -1,14 +1,15 @@
 version: 2
 jobs:
+  my-workflow:
+    jobs:
+      - run-tests:
+          context: dev
   build:
     docker:
       - image: circleci/python:2.7-jessie
 
     steps:
       - checkout
-
-      - run:
-          context: dev
 
       - run:
           name: Install packages
