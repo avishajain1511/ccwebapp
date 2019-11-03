@@ -1,9 +1,7 @@
 version: 2
-my-workflow:
-
-  jobs:
-    - run-tests:
-        context: dev
+jobs:
+  - run-tests:
+    context: org-global
   build:
     docker:
       - image: circleci/python:2.7-jessie
