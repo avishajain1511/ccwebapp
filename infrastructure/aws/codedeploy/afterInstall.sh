@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd webapp
+sudo chown 777 /home/centos/webapp/
 
 # sudo systemctl stop tomcat.service
 
