@@ -1,6 +1,5 @@
 #!/bin/bash
 
-sudo chown centos /home/centos/webapp/
 sudo mv /home/centos/.env /home/centos/webapp/
 
 

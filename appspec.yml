@@ -5,6 +5,20 @@ files:
   - source: ./webapp
     destination: /home/centos/webapp
 
+permissions:
+  - object: /home/centos/webapp
+    owner: centos
+    group: centos
+    mode: 700
+    type:
+      - file
+  - object: /home/centos/webapp
+    owner: centos
+    group: centos
+    mode: 700
+    type:
+      - directory
+
 hooks:
   BeforeInstall:
    - location: ./beforeInstall.sh
