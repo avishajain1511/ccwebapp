@@ -1,8 +1,6 @@
 #!/bin/bash
 
 sudo chown centos /home/centos/webapp/
-sudo touch /home/centos/webapp/myfile
-sudo touch testfile
 sudo mv /home/centos/.env /home/centos/webapp/
 
 
