@@ -1,12 +1,14 @@
 #!/bin/bash
 
-sudo systemctl stop tomcat.service
+sudo chmod 777 webapp
 
-sudo rm -rf /opt/tomcat/webapps/docs  /opt/tomcat/webapps/examples /opt/tomcat/webapps/host-manager  /opt/tomcat/webapps/manager /opt/tomcat/webapps/ROOT
+# sudo systemctl stop tomcat.service
 
-sudo chown tomcat:tomcat /opt/tomcat/webapps/ROOT.war
+# sudo rm -rf /opt/tomcat/webapps/docs  /opt/tomcat/webapps/examples /opt/tomcat/webapps/host-manager  /opt/tomcat/webapps/manager /opt/tomcat/webapps/ROOT
 
-# cleanup log files
-sudo rm -rf /opt/tomcat/logs/catalina*
-sudo rm -rf /opt/tomcat/logs/*.log
-sudo rm -rf /opt/tomcat/logs/*.txt
+# sudo chown tomcat:tomcat /opt/tomcat/webapps/ROOT.war
+
+# # cleanup log files
+# sudo rm -rf /opt/tomcat/logs/catalina*
+# sudo rm -rf /opt/tomcat/logs/*.log
+# sudo rm -rf /opt/tomcat/logs/*.txt
