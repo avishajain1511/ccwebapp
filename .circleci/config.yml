@@ -28,7 +28,7 @@ jobs:
       - run:
           name: Install MySQL CLI; Import dummy data; run an example query
           command: |
-            sudo apt-get install default-mysql-client
+            sudo apt-get install mysql-client
             mysql -h 127.0.0.1 -u dbuser -pMaster123 --execute="SHOW DATABASES"
 
       - run:
