@@ -29,7 +29,8 @@ jobs:
           name: Install MySQL CLI; Import dummy data; run an example query
           command: |
             sudo apt-get install mysql-client
-            mysql -h 127.0.0.1 -u dbuser -pMaster123 --execute="SHOW DATABASES"
+            mysql -h 127.0.0.1 -u dbuser -pMaster123 --execute="ALTER USER 'root'@'localhost' IDENTIFIED BY 'Master123"
+            mysql -h 127.0.0.1 -u dbuser -pMaster123 --execute="ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'Master123"
 
       - run:
           name: Install packages
