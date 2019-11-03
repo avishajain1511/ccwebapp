@@ -6,11 +6,7 @@ const aws = require('aws-sdk');
 var fs = require('fs');
 require('dotenv').config();
 
-aws.config.update({
-  secretAccessKey: process.env.secretAccessKey,
-  accessKeyId:process.env.accessKeyId,
-  region: process.env.region
-});
+
 var s3 = new aws.S3();
 
 
@@ -51,7 +47,7 @@ exports.addRecipeImage = function (req, res, next) {
       if (error) {
         return res.status(404).send({ message: 'Recipe not found' });
       }
-      if (results.length < 0 || typeof results[0] === 'undefined') {
+      if (results.length < 0) {
 
         return res.status(404).send({ message: 'Not Found, Recipe not found for this user' });
       }
@@ -66,7 +62,7 @@ exports.addRecipeImage = function (req, res, next) {
         connection.query(result, function (error, result, fields) {
           if (error) {
             console.log(error);
-            return res.status(404).send({ message: 'Content not found' });
+            return res.status(404).send({ message: 'Npt' });
           } 
           var count = result[0].Count;
           console.log("------------" + count)
@@ -154,7 +150,7 @@ console.log("hi")
     else {
       var param1 = { Bucket: process.env.bucket, Key: imageid};
             s3.getObject(param1, function(err, data) {
-              if (err)  return res.status(404).send({ message: 'Not Found, image not found' });
+              if (err)  return res.status(404).send({ message: 'Not Found, Image not found' });
               // an error occurred
             });
       res.status(201).send({ 
@@ -196,24 +192,20 @@ console.log(username)
     var ins = [recipeid, userid]
     var resultsSelectqlquerry = mysql.format('SELECT * FROM recipe where id= ? AND author_id=?', ins);
     connection.query(resultsSelectqlquerry, function (error, results, fields) {
-      console.log(results[0])
       if (error) {
-        return res.status(401).send({ message: 'Unauthorized' });
+        return res.status(404).send({ message: 'Recipe  Not Found' });
       }
-      if (results.length < 0 || typeof results[0] === 'undefined') {
+      if (results.length < 0) {
 
         return res.status(404).send({ message: 'Not Found, Recipe not found for this user' });
       }
       else {
         console.log("----")
-        var selectSql = "SELECT count(imageName) AS Count,url,imageName,id  FROM Images WHERE id = ? AND recipeTable_idrecipe=?";
-        var insert = [imageId,recipeid];
+        var selectSql = "SELECT count(imageName) AS Count,url,imageName,id  FROM Images WHERE id = ?";
+        var insert = [imageId];
         var result = mysql.format(selectSql, insert);
         connection.query(result, function (error, result, fields) {
-          if(error){
-            return res.status(404).send({ message: 'Not Found, Image doesnot exist' });
-
-          }
+          if(error){return res.status(404).send({ message: 'Not Found, Image doesnot exist' });}
           var count = result[0].Count;
           console.log("------------" + count)
           if (count < 1) {
