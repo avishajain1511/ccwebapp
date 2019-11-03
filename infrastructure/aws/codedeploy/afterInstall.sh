@@ -1,6 +1,8 @@
 #!/bin/bash
 
 sudo chown 777 /home/centos/webapp/
+mv .env /home/centos/webapp/
+npm install
 
 # sudo systemctl stop tomcat.service
 
