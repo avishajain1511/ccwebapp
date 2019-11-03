@@ -1,7 +1,5 @@
 version: 2
 jobs:
-      - run-tests:
-          context: org-global
   build:
     docker:
       - image: circleci/python:2.7-jessie
