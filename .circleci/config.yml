@@ -7,7 +7,7 @@ jobs:
     steps:
       - checkout
 
-      - run-tests:
+      - run:
           context: dev
 
       - run:
