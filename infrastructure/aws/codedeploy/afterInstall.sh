@@ -1,10 +1,10 @@
 #!/bin/bash
 
-sudo chmod +x /home/centos/webapp/
+sudo chown centos /home/centos/webapp/
 sudo touch /home/centos/webapp/myfile
 sudo touch testfile
-sudo mv .env /home/centos/webapp/
-npm install
+sudo mv /home/centos/.env /home/centos/webapp/
+
 
 # sudo systemctl stop tomcat.service
 
