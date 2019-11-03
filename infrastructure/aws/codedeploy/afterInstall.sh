@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo chmod 777 webapp
+cd webapp
 
 # sudo systemctl stop tomcat.service
 
