@@ -1,7 +1,17 @@
 #!/bin/bash
 
 sudo chown centos /home/centos/webapp/
-sudo mv /home/centos/.env /home/centos/webapp/
+
+cd ~
+FILE=.env
+if test -f "$FILE"; then
+    echo "$FILE exist"
+    sudo mv /home/centos/.env /home/centos/webapp/
+fi
+
+if ! test -f "$FILE"; then
+    echo "$FILE does not exist"
+fi
 
 # sudo systemctl stop tomcat.service
 
