@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo chown 777 /home/centos/webapp/
+sudo chmod +x /home/centos/webapp/
 mv .env /home/centos/webapp/
 npm install
 
