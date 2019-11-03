@@ -32,7 +32,7 @@ jobs:
       - run:
           name: Zip Artifact
           command: |
-            echo "Hello the current build number is ${CIRCLE_BUILD_NUM}"
+            echo "Hello current build number is ${CIRCLE_BUILD_NUM}"
             aws configure set default.region us-east-1
             pwd
             ls -al
