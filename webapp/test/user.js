@@ -141,6 +141,21 @@ describe('GET /user', function (done) {
         }).then(done);
     });
 
+    it("Unvalid 2 creds", (done) => {
+        chai.request(app)
+            .post('/v1/user/')
+            .send(wrongPostCredentials2)
+            .then((res) => {
+                //assertions
+                this.timeout(500);
+                setTimeout(done, 300);
+                expect(res).to.have.status(400);
+                done();
+
+            }).catch(err => {
+                done(err);
+            });
+    });
 
 
 });
