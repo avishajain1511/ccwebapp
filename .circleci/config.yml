@@ -53,6 +53,9 @@ jobs:
             cd webapp
             pwd
             ls -al
+            npm install
+            npm install -g mocha
+            mocha
 
       - run:
           name: Zip Artifact
@@ -61,6 +64,9 @@ jobs:
             aws configure set default.region us-east-1
             pwd
             ls -al
+            sudo rm -r webapp/node_modules/
+            sudo rm webapp/package.json
+            sudo rm webapp/package-lock.json
             mkdir -p codedeploy_artifact
             cp infrastructure/aws/codedeploy/*.sh .
             zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp *.sh *.yml
