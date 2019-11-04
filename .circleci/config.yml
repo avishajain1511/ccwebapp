@@ -53,8 +53,8 @@ jobs:
             cd webapp
             pwd
             ls -al
-            npm install
-            npm install -g mocha
+            sudo npm install
+            sudo npm install -g mocha
             mocha
 
       - run:
