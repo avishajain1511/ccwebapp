@@ -5,4 +5,4 @@ npm install
 
 nohup node server.js >> app.log 2>&1 &
 
-echo "starting application"
+echo "starting application on 3001"
