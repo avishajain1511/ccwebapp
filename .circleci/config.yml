@@ -54,6 +54,7 @@ jobs:
             pwd
             ls -al
             sudo npm install
+            ls -al
             sudo npm install -g mocha
             mocha
 
