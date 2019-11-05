@@ -5,7 +5,12 @@ var connection = require('../models/app.model');
 var schema = require('./passwordValidator');
 const uuidv1 = require('uuid/v1');
 
+var SDC = require('statsd-client'),
+    sdc = new SDC({host: 'localhost'});
+
 exports.register = function (req, res) {
+
+    sdc.increment('some.counter');
 
     console.log("req", req.body);
     if (req.body.firstname == null || req.body.lastname == null || (req.body.firstname).trim().length < 1 || (req.body.lastname).trim().length < 1 || req.body.password == null || req.body.email == null) {
