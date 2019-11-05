@@ -5,7 +5,7 @@ var connection = require('../models/app.model');
 var schema = require('./passwordValidator');
 const uuidv1 = require('uuid/v1');
 
-var SDC = require('statsd-client'),
+var SDC = require('node-statsd-client'),
     sdc = new SDC({host: 'localhost'});
 
 exports.register = function (req, res) {
