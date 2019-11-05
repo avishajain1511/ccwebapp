@@ -4,8 +4,15 @@ var mysql = require('mysql');
 var connection = require('../models/app.model');
 var schema = require('./passwordValidator');
 const uuidv1 = require('uuid/v1');
+var Client = require('node-statsd-client').Client;
+
+var client = new Client("localhost", 8192);
+
+
 
 exports.register = function (req, res) {
+client.count("num_logged_users", 1);
+
 
     console.log("req", req.body);
     if (req.body.firstname == null || req.body.lastname == null || (req.body.firstname).trim().length < 1 || (req.body.lastname).trim().length < 1 || req.body.password == null || req.body.email == null) {
