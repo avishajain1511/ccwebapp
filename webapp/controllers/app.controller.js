@@ -7,19 +7,20 @@ const uuidv1 = require('uuid/v1');
 var Client = require('node-statsd-client').Client;
 const logger = require('../config/winston');
 var client = new Client("localhost", 8125);
-
+var registerCounter=0;
 
 
 exports.register = function (req, res) {
        logger.info("Register Recipe");
-       client.count("Rgister Api call", 10);
+       client.count("Rgister Api call", 1);
     client.increment('Register');
     var start = new Date();
 setTimeout(function () {
     client.timing('random.timeout', start);
 }, 100 * Math.random());
 
-client.count("num_logged_users", 1);
+registerCounter=registerCounter+1;
+client.count("num_logged_users", registerCounter);
 
 
 
