@@ -121,15 +121,24 @@ exports.addRecipeImage = function (req, res, next) {
               ETag: data.ETag,
               ContentType: data.ContentLength,
             }
+            var databsecalled = new Date();
             connection.query('INSERT INTO Images SET ?', image, function (error, results, fields) {
+             
+              var dbapiTimer =appicalled-databsecalled;
+              console.log(dbapiTimer);
+              client.count("Process time of Image database", dbapiTimer);
+
               var appicalled = new Date();
+              
               console.log(appicalled);
               console.log(appiStart);
+
               var apiTimer =appicalled-appiStart;
               console.log(apiTimer);
               client.count("Process time of Image API", apiTimer);
+
               if (error) {
-                console.log("Bad Request", error);
+                console.log("Bad Request", error);  
                 res.status(400).send({
                   "failed": "Bad Request, Cannot enter recipe"
                 })
