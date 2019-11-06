@@ -1,9 +1,9 @@
-  version: 2
+version: 2
 jobs:
   build:
     branches:
       only:
-        - master
+        - assgn7
     docker:
       - image: circleci/python:2.7-jessie
       - image: circleci/mysql:latest
