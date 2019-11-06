@@ -22,10 +22,7 @@ jobs:
       - run: # test what branch we're on.
           name: "What branch am I on?"
           command: echo ${GIT_BRANCH}
-      - run:
-          name: "What branch am I on now?"
-          command: echo $GIT_BRANCH
-          
+
       - run:
       # Our primary container isn't MYSQL so run a sleep command until it is ready
           name: Waiting for MySQL to be ready
