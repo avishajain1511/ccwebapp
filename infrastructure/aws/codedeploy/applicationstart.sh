@@ -2,6 +2,7 @@
 
 cd /home/centos/webapp/
 npm install
+sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a fetch-config -m ec2 -c file:/home/centos/webapp/cloudwatch-config.json -s
 
 nohup node server.js >> app.log 2>&1 &
 

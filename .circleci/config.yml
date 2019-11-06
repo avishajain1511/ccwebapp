@@ -15,7 +15,7 @@ jobs:
       - checkout
 
       - run:
-      # Our primary container isn't MYSQL so run a sleep command until it is ready.
+      # Our primary container isn't MYSQL so run a sleep command until it is ready
           name: Waiting for MySQL to be ready
           command: |
             for i in `seq 1 10`;
@@ -53,6 +53,9 @@ jobs:
             cd webapp
             pwd
             ls -al
+            npm install
+            sudo chown -R circleci /usr/lib/node_modules
+            sudo npm install -g mocha
 
       - run:
           name: Zip Artifact
@@ -61,6 +64,7 @@ jobs:
             aws configure set default.region us-east-1
             pwd
             ls -al
+            sudo rm -r webapp/node_modules/
             mkdir -p codedeploy_artifact
             cp infrastructure/aws/codedeploy/*.sh .
             zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp *.sh *.yml

@@ -2,7 +2,7 @@ Readme.md
 # CSYE 6225 - Fall 2019
 
 
-## Team Information
+## Team  Information
 
 | Name | NEU ID | Email Address |
 | Achira Shah | 001409351 | shah.ac@husky.neu.edu |
