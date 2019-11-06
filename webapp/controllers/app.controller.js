@@ -9,16 +9,14 @@ const logger = require('../config/winston');
 var client = new Client("localhost", 8125);
 var registerCounter=0;
 var updateCounter=0;
-
+var getCounter=0;
 
 exports.register = function (req, res) {
-       logger.info("Register Recipe");
+       logger.info("Register User");
        client.count("Rgister Api call", 1);
     client.increment('Register');
     var start = new Date();
-setTimeout(function () {
-    client.timing('random.timeout', start);
-}, 100 * Math.random());
+
 
 registerCounter=registerCounter+1;
 client.count("count register api", registerCounter);
@@ -61,7 +59,9 @@ client.count("count register api", registerCounter);
             return res.status(400).send({ message: 'Bad Request, Invalid email' });
         }
         connection.query('INSERT INTO users SET ?', users, function (error, results, fields) {
-            
+            setTimeout(function () {
+                client.timing('insert user timming', start);
+            }, 100 * Math.random());
             if (error) {
                 console.log("Bad Request, cannot insert user", error);
                 res.send({
@@ -89,7 +89,7 @@ client.count("count register api", registerCounter);
 exports.update = function (req, res) {
     updateCounter=updateCounter+1;
     client.count("count update api", updateCounter);
-    logger.info("update Recipe");
+    logger.info("update User");
 
     var today = new Date();
     var token = req.headers['authorization'];
@@ -171,7 +171,9 @@ exports.update = function (req, res) {
 }
 
 exports.login = function (req, res) {
-
+    getCounter=getCounter+1;
+    client.count("count user get api", getCounter);
+    logger.info("get user");
     var token = req.headers['authorization'];
 
     if (!token) return res.status(401).send({ message: 'Unauthorization' });
