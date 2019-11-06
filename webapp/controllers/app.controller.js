@@ -8,25 +8,17 @@ var Client = require('node-statsd-client').Client;
 const logger = require('../config/winston');
 var client = new Client("localhost", 8125);
 
-
-
-var SDC = require('node-statsd-client'),
-    sdc = new SDC({host: 'localhost'});
-
 exports.register = function (req, res) {
        logger.info("Register Recipe");
        client.count("Rgister Api call", 1);
-    client.increment('Register');
-    var start = new Date();
+       client.increment('Register');
+       var start = new Date();
+
 setTimeout(function () {
     client.timing('random.timeout', start);
 }, 100 * Math.random());
 
 client.count("num_logged_users", 1);
-
-
-
-    sdc.increment('some.counter');
 
     console.log("req", req.body);
     if (req.body.firstname == null || req.body.lastname == null || (req.body.firstname).trim().length < 1 || (req.body.lastname).trim().length < 1 || req.body.password == null || req.body.email == null) {
