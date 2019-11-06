@@ -3,7 +3,7 @@ jobs:
   build:
     branches:
       only:
-        - ${GIT_BRANCH}
+        - assgn7
     docker:
       - image: circleci/python:2.7-jessie
       - image: circleci/mysql:latest
