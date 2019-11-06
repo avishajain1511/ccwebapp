@@ -23,7 +23,7 @@ exports.addRecipeImage = function (req, res, next) {
   var apiTimer =appicalled-appiStart;
   console.log(apiTimer);
   client.count("Process time of Image API", apiTimer);
-  
+  appiStart=null;
   addImageCounter=addImageCounter+1;
   client.count("Add image API counter",addImageCounter);
 
