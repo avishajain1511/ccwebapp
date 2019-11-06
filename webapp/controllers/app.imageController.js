@@ -11,19 +11,14 @@ require('dotenv').config();
 
 var addImageCounter=0;
 var s3 = new aws.S3();
-var appiStart = new Date();
+var datbaseStart = new Date();
 
 
 exports.addRecipeImage = function (req, res, next) {
+  var appiStart = new Date();
 
   logger.info("Add image Api");
-  var appicalled = new Date();
-  console.log(appicalled);
-  console.log(appiStart);
-  var apiTimer =appicalled-appiStart;
-  console.log(apiTimer);
-  client.count("Process time of Image API", apiTimer);
-  appiStart=null;
+
   addImageCounter=addImageCounter+1;
   client.count("Add image API counter",addImageCounter);
 
@@ -121,6 +116,12 @@ exports.addRecipeImage = function (req, res, next) {
               ContentType: data.ContentLength,
             }
             connection.query('INSERT INTO Images SET ?', image, function (error, results, fields) {
+              var appicalled = new Date();
+              console.log(appicalled);
+              console.log(appiStart);
+              var apiTimer =appicalled-appiStart;
+              console.log(apiTimer);
+              client.count("Process time of Image API", apiTimer);
               if (error) {
                 console.log("Bad Request", error);
                 res.status(400).send({
@@ -132,6 +133,8 @@ exports.addRecipeImage = function (req, res, next) {
                   "id": imageid,
                   "url":data1.Location
                  });
+
+
               }
             });
           });
