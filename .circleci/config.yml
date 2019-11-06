@@ -23,7 +23,6 @@ jobs:
             echo 'export MY_ENV_VAR="FOO"' >> $BASH_ENV # Redirect MY_ENV_VAR into $BASH_ENV
       # Run a step to print what branch our code base is on.
 
-
       - run:
       # Our primary container isn't MYSQL so run a sleep command until it is ready
           name: Waiting for MySQL to be ready
