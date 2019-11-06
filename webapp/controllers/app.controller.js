@@ -16,7 +16,6 @@ exports.register = function (req, res) {
        client.increment("Register yser incrment");
        var start = new Date();
 
-
 registerCounter=registerCounter+1;
 client.count("count register api", registerCounter);
 
