@@ -21,10 +21,10 @@ jobs:
 
       - run: # test what branch we're on.
           name: "What branch am I on?"
-          command: echo ${CIRCLE_BRANCH}
+          command: echo ${GIT_BRANCH}
       - run:
           name: "What branch am I on now?"
-          command: echo $CIRCLE_BRANCH
+          command: echo $GIT_BRANCH
       - run:
           name: "What was my custom environment variable?"
           command: echo ${MY_ENV_VAR}
@@ -81,7 +81,6 @@ jobs:
             pwd
             ls -al
             sudo rm -r webapp/node_modules/
-            sudo rm webapp/*.log
             mkdir -p codedeploy_artifact
             cp infrastructure/aws/codedeploy/*.sh .
             zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp *.sh *.yml
