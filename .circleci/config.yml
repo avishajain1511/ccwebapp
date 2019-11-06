@@ -4,7 +4,7 @@ jobs:
     filters:
       branches:
         only:
-          - a7-demo
+          - ${GIT_BRANCH}
     docker:
       - image: circleci/python:2.7-jessie
       - image: circleci/mysql:latest
