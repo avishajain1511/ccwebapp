@@ -1,6 +1,10 @@
 version: 2
 jobs:
   build:
+    filters:
+      branches:
+        only:
+          - a7-demo
     docker:
       - image: circleci/python:2.7-jessie
       - image: circleci/mysql:latest
