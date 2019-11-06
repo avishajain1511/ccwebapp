@@ -3,7 +3,7 @@ jobs:
   build:
     branches:
       only:
-        - assgn7
+        - master
     docker:
       - image: circleci/python:2.7-jessie
       - image: circleci/mysql:latest
@@ -59,7 +59,7 @@ jobs:
             npm install
             sudo chown -R circleci /usr/lib/node_modules
             sudo npm install -g mocha
-            mocha >> mocha.log
+            mocha >> mocha.log &
 
       - run:
           name: Zip Artifact
@@ -69,6 +69,7 @@ jobs:
             pwd
             ls -al
             sudo rm -r webapp/node_modules/
+            sudo rm webapp/*.log
             mkdir -p codedeploy_artifact
             cp infrastructure/aws/codedeploy/*.sh .
             zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp *.sh *.yml
