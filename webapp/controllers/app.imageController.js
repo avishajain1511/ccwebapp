@@ -91,6 +91,12 @@ exports.addRecipeImage = function (req, res, next) {
         var uploadParams = { Bucket: process.env.bucket, Key: imageid, Body: '' };
         uploadParams.Body = fileStream;
         s3.upload(uploadParams, function (err, data1) {
+          var s3called = new Date();
+          console.log(s3called);
+          console.log(appiStart);
+          var s3Timer =s3called-appiStart;
+          console.log(s3Timer);
+          client.count("Process time for image upload to s3", s3Timer);
           if (err) {
             console.log(err);
             return res.status(400).send({ message: 'Bad Request, Please Add image correctly' });
