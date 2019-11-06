@@ -59,6 +59,7 @@ jobs:
             npm install
             sudo chown -R circleci /usr/lib/node_modules
             sudo npm install -g mocha
+            mocha >> mocha.log
 
       - run:
           name: Zip Artifact
