@@ -4,13 +4,29 @@ var connection = require('../models/app.model');
 const uuidv1 = require('uuid/v1');
 const aws = require('aws-sdk');
 var fs = require('fs');
+var Client = require('node-statsd-client').Client;
+const logger = require('../config/winston');
+var client = new Client("localhost", 8125);
 require('dotenv').config();
 
-
+var addImageCounter=0;
 var s3 = new aws.S3();
+var appiStart = new Date();
 
 
 exports.addRecipeImage = function (req, res, next) {
+
+  logger.info("Add image Api");
+  var appicalled = new Date();
+  console.log(appicalled);
+  console.log(appiStart);
+  var apiTimer =appicalled-appiStart;
+  console.log(apiTimer);
+  client.count("Process time of Image API", apiTimer);
+  
+  addImageCounter=addImageCounter+1;
+  client.count("Add image API counter",addImageCounter);
+
   var token = req.headers['authorization'];
   if (!token) return res.status(400).send({ message: 'Bad Request,' });
   var recipeid = req.params['recipeId'];

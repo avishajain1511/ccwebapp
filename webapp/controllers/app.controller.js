@@ -13,8 +13,7 @@ var getCounter=0;
 
 exports.register = function (req, res) {
        logger.info("Register User");
-    client.increment('Register');
-    var start = new Date();
+       var start = new Date();
 
 
 registerCounter=registerCounter+1;
