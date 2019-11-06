@@ -87,7 +87,9 @@ client.count("count register api", registerCounter);
     });
 };
 exports.update = function (req, res) {
+    updateCounter=updateCounter+1;
     client.count("count update api", updateCounter);
+    logger.info("update Recipe");
 
     var today = new Date();
     var token = req.headers['authorization'];
