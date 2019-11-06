@@ -12,7 +12,7 @@ var client = new Client("localhost", 8125);
 
 exports.register = function (req, res) {
        logger.info("Register Recipe");
-       client.count("Rgister Api call", 1);
+       client.count("Rgister Api call", 10);
     client.increment('Register');
     var start = new Date();
 setTimeout(function () {
