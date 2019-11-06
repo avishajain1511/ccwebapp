@@ -4,13 +4,24 @@ var connection = require('../models/app.model');
 const uuidv1 = require('uuid/v1');
 const aws = require('aws-sdk');
 var fs = require('fs');
+var Client = require('node-statsd-client').Client;
+const logger = require('../config/winston');
+var client = new Client("localhost", 8125);
 require('dotenv').config();
 
-
+var addImageCounter=0;
 var s3 = new aws.S3();
+var datbaseStart = new Date();
 
 
 exports.addRecipeImage = function (req, res, next) {
+  var appiStart = new Date();
+
+  logger.info("Add image Api");
+
+  addImageCounter=addImageCounter+1;
+  client.count("Add image API counter",addImageCounter);
+
   var token = req.headers['authorization'];
   if (!token) return res.status(400).send({ message: 'Bad Request,' });
   var recipeid = req.params['recipeId'];
@@ -80,6 +91,12 @@ exports.addRecipeImage = function (req, res, next) {
         var uploadParams = { Bucket: process.env.bucket, Key: imageid, Body: '' };
         uploadParams.Body = fileStream;
         s3.upload(uploadParams, function (err, data1) {
+          var s3called = new Date();
+          console.log(s3called);
+          console.log(appiStart);
+          var s3Timer =s3called-appiStart;
+          console.log(s3Timer);
+          client.count("Process time for image upload to s3", s3Timer);
           if (err) {
             console.log(err);
             return res.status(400).send({ message: 'Bad Request, Please Add image correctly' });
@@ -104,9 +121,24 @@ exports.addRecipeImage = function (req, res, next) {
               ETag: data.ETag,
               ContentType: data.ContentLength,
             }
+            var databsecalled = new Date();
             connection.query('INSERT INTO Images SET ?', image, function (error, results, fields) {
+             
+              var dbapiTimer =appicalled-databsecalled;
+              console.log(dbapiTimer);
+              client.count("Process time of Image database", dbapiTimer);
+
+              var appicalled = new Date();
+              
+              console.log(appicalled);
+              console.log(appiStart);
+
+              var apiTimer =appicalled-appiStart;
+              console.log(apiTimer);
+              client.count("Process time of Image API", apiTimer);
+
               if (error) {
-                console.log("Bad Request", error);
+                console.log("Bad Request", error);  
                 res.status(400).send({
                   "failed": "Bad Request, Cannot enter recipe"
                 })
@@ -116,6 +148,8 @@ exports.addRecipeImage = function (req, res, next) {
                   "id": imageid,
                   "url":data1.Location
                  });
+
+
               }
             });
           });
