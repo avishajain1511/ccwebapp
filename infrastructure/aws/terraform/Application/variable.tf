@@ -30,5 +30,31 @@ variable "num" {
   type = "string"
 }
 
+variable "aws_accountid" {
+  type = "string"
+}
+
+variable "aws_application_name" {
+  type = "string"
+}
+
+variable "aws_circleci_user_name" {
+  type = "string"
+}
+
+variable "aws_application_group" {
+  type = "string"
+}
+
+variable "s3_bucket_name_application" {
+  type = "string"
+}
+
+variable "end_point" {
+  type = "string"
+}
+
+
+
 
 

@@ -2,6 +2,12 @@ var bcrypt = require('bcrypt');
 var mysql = require('mysql');
 var connection = require('../models/app.model');
 const uuidv1 = require('uuid/v1');
+const aws = require('aws-sdk');
+var fs = require('fs');
+var Client = require('node-statsd-client').Client;
+const logger = require('../config/winston');
+var client = new Client("localhost", 8125);
+var s3 = new aws.S3();
 
 exports.registerRecipe = function (req, res) {
   var token = req.headers['authorization'];
@@ -219,14 +225,29 @@ exports.registerRecipe = function (req, res) {
                                       } else {
                                         if (results2.length > 0) {
                                           console.log("result------------" + results2.length);
-
-                                          output = results[0];
-                                          output['ingredients'] = ingredients
-                                          output['steps'] = results1
-                                          output['nutrition_information'] = results2[0]
-                                          console.log(results2);
-                                          res.send(output);
-
+                                          connection.query(' SELECT id,url from Images where recipeTable_idrecipe=? ', recipeid, function (error, image, fields) {
+                                            if (error) {
+                                              return res.status(404).send({ message: 'Nutrition data not found' });
+                                            } else {
+                                              if (image.length > 0) {
+                                                output = results[0];
+                                                output['Images'] = image
+                                                output['ingredients'] = ingredients
+                                                output['steps'] = results1
+                                                output['nutrition_information'] = results2[0]
+                                                console.log(results2);
+                                                res.send(output);
+                                              }else{
+                                                output = results[0];
+                                                output['Images'] = null
+                                                output['ingredients'] = ingredients
+                                                output['steps'] = results1
+                                                output['nutrition_information'] = results2[0]
+                                                console.log(results2);
+                                                res.send(output);
+                                              }
+                                            }
+                                          });
                                         }
                                         else {
                                           return res.status(404).send({ message: 'Nutrition not found' });
@@ -306,13 +327,29 @@ exports.getRecipe = function (req, res) {
                   if (results2.length > 0) {
                     console.log("result------------" + results2.length);
 
-                    output = results[0];
-                    output['ingredients'] = ingredients
-                    output['steps'] = results1
-                    output['nutrition_information'] = results2[0]
-                    console.log(results2);
-                    res.send(output);
-
+                    connection.query(' SELECT id,url from Images where recipeTable_idrecipe=? ', recipeid, function (error, image, fields) {
+                      if (error) {
+                        return res.status(404).send({ message: 'Nutrition data not found' });
+                      } else {
+                        if (image.length > 0) {
+                          output = results[0];
+                          output['Images'] = image
+                          output['ingredients'] = ingredients
+                          output['steps'] = results1
+                          output['nutrition_information'] = results2[0]
+                          console.log(results2);
+                          res.send(output);
+                        }else{
+                          output = results[0];
+                          output['Images'] = null
+                          output['ingredients'] = ingredients
+                          output['steps'] = results1
+                          output['nutrition_information'] = results2[0]
+                          console.log(results2);
+                          res.send(output);
+                        }
+                      }
+                    });
                   }
                   else {
                     return res.status(400).send({ message: 'Bad  Request, No Value for this id available in NutritionInformation' });
@@ -395,24 +432,61 @@ exports.deleteRecipe = function (req, res) {
                     "failed": "Not Found"
                   })
                 } else {
-                  console.log("author_id-----------"+userid)
-                  var ins =[recipeid]
-                 var resultsqlquerry = mysql.format('Delete from recipe where id= ?', ins);
-                  connection.query(resultsqlquerry,  function (error, results, fields) {
-                    console.log("hi i am here at orderlist");
-
+                  connection.query('select id from Images where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
                     if (error) {
-                      console.log("Bad Request", error);
-                      return res.send({
+                      console.log("Not Found", error);
+                      res.send({
                         "code": 404,
                         "failed": "Not Found"
                       })
-                    } else {
-                      res.status(204).send({ message: "No Content" });
-
                     }
+                    else {
+                      results.forEach(function (img) {
+                        console.log(img.id);
+                        var params = { Bucket: process.env.bucket, Key: img.id };
+                        s3.deleteObject(params, function (err, data) {
+                          if (err) {
+                            logger.error(err);
+                            return res.status(500).send({
+                              error: 'Error deleting the file from storage system'
+                            });
+                          }
+                          connection.query('Delete from Images where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
+                            console.log("hi i am here at orderlist");
 
-                  });
+                            if (error) {
+                              console.log("Not Found", error);
+                              res.send({
+                                "code": 404,
+                                "failed": "Not Found"
+                              })
+                            }else{
+                              console.log("author_id-----------"+userid)
+                              var ins =[recipeid]
+                             var resultsqlquerry = mysql.format('Delete from recipe where id= ?', ins);
+                              connection.query(resultsqlquerry,  function (error, results, fields) {
+                                console.log("hi i am here at orderlist");
+            
+                                if (error) {
+                                  console.log("Bad Request", error);
+                                  return res.send({
+                                    "code": 400,
+                                    "failed": "Bad Request, cannot delete recipe before deleting all the images"
+                                  })
+                                } else {
+                                  res.status(204).send({ message: "No Content" });
+            
+                                }
+            
+                              });
+                            }
+                          });
+                        });
+
+                      });
+                    }
+                  })
+               
                 }
 
               });
@@ -643,7 +717,7 @@ var userid="";
                     insertParam.push(today);
                     insertParam.push(recipeid)
                     insertParam.push(userid)
-                    var updateSqlQuery = updateRecipieSql + parm + "total_time_in_min=? , updated_ts =? WHERE id = ? and author_id=?"
+                    var updateSqlQuery = updateRecipeSql + parm + "total_time_in_min=? , updated_ts =? WHERE id = ? and author_id=?"
                     var updateresult = mysql.format(updateSqlQuery, insertParam);
                     console.log(updateresult)
                     connection.query(updateresult, function (error, result, fields) {
@@ -686,12 +760,29 @@ var userid="";
                                         if (results2.length > 0) {
                                           console.log("result------------" + results2.length);
 
-                                          output = results[0];
-                                          output['ingredients'] = ingredients
-                                          output['steps'] = results1
-                                          output['nutrition_information'] = results2[0]
-                                          console.log(results2);
-                                          res.send(output);
+                                          connection.query(' SELECT id,url from Images where recipeTable_idrecipe=? ', recipeid, function (error, image, fields) {
+                                            if (error) {
+                                              return res.status(404).send({ message: 'Nutrition data not found' });
+                                            } else {
+                                              if (image.length > 0) {
+                                                output = results[0];
+                                                output['Images'] = image
+                                                output['ingredients'] = ingredients
+                                                output['steps'] = results1
+                                                output['nutrition_information'] = results2[0]
+                                                console.log(results2);
+                                                res.send(output);
+                                              }else{
+                                                output = results[0];
+                                                output['Images'] = null
+                                                output['ingredients'] = ingredients
+                                                output['steps'] = results1
+                                                output['nutrition_information'] = results2[0]
+                                                console.log(results2);
+                                                res.send(output);
+                                              }
+                                            }
+                                          });
 
                                         }
                                         else {

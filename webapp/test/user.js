@@ -34,6 +34,12 @@ const validCreds = {
     lastname: "test",
     password: "PaSSword@123"
 }
+const validCreds1 = {
+    firstname: "testinggitproj",
+    lastname: "test",
+    email: "arjun@gmail.com",
+    password: "PaSSword@123"
+}
 
 var authenticatedUser = request.agent(app);
 // set up the data we need to pass to the method
@@ -94,10 +100,21 @@ const invalidRecipe = {
 var authenticatedUser = request.agent(app);
 
 describe('POST /recipe', function (done) {
-   
+    it("valid entry ", (done)=> {
+        chai.request(app)
+        .get('/v1/recipe/:id')
+        .auth('arjun2@gmail.com', 'PaSSword@123')
+        .send(validRecipe)
+        .then((res) => {
+            //assertions
+            expect(res).to.have.status(400);
+        }).catch(err => {
+            console.log(err.message);
+        }).then(done);
+    });
     it("Invalid entry ", (done) => {
         chai.request(app)
-        .post('/v1/recipe/:id')
+        .post('/v1/recipe/')
         .auth('arjun@gmail.com', 'PaSSword@123')
         .send(invalidRecipe)
         .then((res) => {
@@ -110,73 +127,20 @@ describe('POST /recipe', function (done) {
     });
 });
 describe('GET /user', function (done) {
+
     it("valid entry ", (done)=> {
         chai.request(app)
-        .post('/v1/recipe/:id')
+        .get('/v1/recipe/:id')
         .auth('arjun2@gmail.com', 'PaSSword@123')
         .send(validRecipe)
         .then((res) => {
             //assertions
-            expect(res).to.have.status(400);
+            expect(res).to.have.status(404);
         }).catch(err => {
             console.log(err.message);
         }).then(done);
     });
-    it("Get User from creds", (done) => {
-        chai.request(app)
-            .get('/v1/user/self')
-            .auth('arjun2@gmail.com', 'PaSSword@123')
-            .then((res) => {
-                //assertions
-                expect(res).to.have.status(401);
-                this.timeout(500);
-                setTimeout(done, 300);
-            }).catch(err => {
-                done(err);
-            })
-    });
-    it("wrong creds", (done) => {
-        chai.request(app)
-            .put('/v1/user/self')
-            .auth('arjun@gmail.com', 'PaSword@123')
-            .send(wrongCreds)
-            .then((res) => {
-                //assertions
-                this.timeout(500);
-                setTimeout(done, 300);
-                expect(res).to.have.status(401);
-            }).catch(err => {
-                done(err);
-            })
-    });
-    it("valid creds", (done) => {
-        chai.request(app)
-            .put('/v1/user/self')
-            .auth('arjun@gmail.com', 'PaSSword@123')
-            .send(validCreds)
-            .then((res) => {
-                //assertions
-                this.timeout(500);
-                setTimeout(done, 300);
-                expect(res).to.have.status(401);
-            }).catch(err => {
-                done(err);
-            })
-    });
-    it("Unvalid creds", (done) => {
-        chai.request(app)
-            .post('/v1/user/')
-            .send(wrongPostCredentials)
-            .then((res) => {
-                //assertions
-                this.timeout(500);
-                setTimeout(done, 300);
-                expect(res).to.have.status(400);
-                done();
-            }).catch(err => {
-                console.log(err.message);
-            });
-    });
+
     it("Unvalid 2 creds", (done) => {
         chai.request(app)
             .post('/v1/user/')
