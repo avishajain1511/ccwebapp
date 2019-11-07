@@ -4,6 +4,9 @@ var connection = require('../models/app.model');
 const uuidv1 = require('uuid/v1');
 const aws = require('aws-sdk');
 var fs = require('fs');
+var Client = require('node-statsd-client').Client;
+const logger = require('../config/winston');
+var client = new Client("localhost", 8125);
 var s3 = new aws.S3();
 
 exports.registerRecipe = function (req, res) {
