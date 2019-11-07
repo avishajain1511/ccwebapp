@@ -442,8 +442,8 @@ exports.deleteRecipe = function (req, res) {
                     }
                     else {
                       results.forEach(function (img) {
-                        console.log(img);
-                        var params = { Bucket: process.env.bucket, Key: img.id, Body: '' };
+                        console.log(img.id);
+                        var params = { Bucket: process.env.bucket, Key: img.id };
                         s3.deleteObject(params, function (err, data) {
                           if (err) {
                             logger.error(err);
