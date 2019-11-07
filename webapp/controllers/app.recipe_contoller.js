@@ -442,11 +442,12 @@ exports.deleteRecipe = function (req, res) {
                     }
                     else {
                       results.forEach(function (img) {
+                        console.log(img);
                         var params = { Bucket: process.env.bucket, Key: img.id, Body: '' };
                         s3.deleteObject(params, function (err, data) {
                           if (err) {
                             logger.error(err);
-                            return response.status(500).send({
+                            return res.status(500).send({
                               error: 'Error deleting the file from storage system'
                             });
                           }
