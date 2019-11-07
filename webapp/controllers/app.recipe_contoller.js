@@ -8,8 +8,18 @@ var Client = require('node-statsd-client').Client;
 const logger = require('../config/winston');
 var client = new Client("localhost", 8125);
 var s3 = new aws.S3();
+var registerCounter=0;
+var updateCounter=0;
+var getCounter=0;
 
 exports.registerRecipe = function (req, res) {
+  logger.info("register recipe");
+  var start = new Date();
+
+
+  registerCounter=registerCounter+1;
+  client.count("count register recipe api", registerCounter);
+
   var token = req.headers['authorization'];
   if (!token) return res.status(401).send({ message: 'No authorization token' });
 
@@ -286,7 +296,10 @@ exports.registerRecipe = function (req, res) {
 };
 
 exports.getRecipe = function (req, res) {
+  getCounter=getCounter+1;
+  client.count("count get recipe api", getCounter);
 
+  logger.info("getting recipe");
   console.log(req.params['id']);
 
   var recipeid = req.params['id'];
@@ -371,6 +384,7 @@ exports.getRecipe = function (req, res) {
 };
 
 exports.deleteRecipe = function (req, res) {
+  logger.info("deleting recipe");
   var recipeid = req.params['id'];
 
   console.log("req", req.body);
@@ -512,7 +526,8 @@ exports.deleteRecipe = function (req, res) {
 };
 
 exports.updateRecipe = function (req, res) {
-
+  updateCounter=updateCounter+1;
+  client.count("count update recipe api", updateCounter);
 
   var today = new Date();
 
