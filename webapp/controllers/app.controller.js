@@ -13,14 +13,10 @@ var getCounter=0;
 
 exports.register = function (req, res) {
        logger.info("Register User");
-       client.increment("Register yser incrment");
        var start = new Date();
-
 
 registerCounter=registerCounter+1;
 client.count("count register api", registerCounter);
-
-
 
     console.log("req", req.body);
     if (req.body.firstname == null || req.body.lastname == null || (req.body.firstname).trim().length < 1 || (req.body.lastname).trim().length < 1 || req.body.password == null || req.body.email == null) {
