@@ -199,7 +199,7 @@ resource "aws_iam_policy" "policy1" {
         "codedeploy:GetDeployment"
       ],
       "Resource": [
-        "arn:aws:codedeploy:${var.aws_region}:${var.aws_accountid}:deploymentgroup:${var.aws_application_group}" 
+        "arn:aws:codedeploy:${var.aws_region}:${var.aws_accountid}:deploymentgroup:${var.aws_application_name}/${var.aws_application_group}" 
       ]
     },
     {
