@@ -467,7 +467,7 @@ exports.deleteRecipe = function (req, res) {
                               connection.query(resultsqlquerry,  function (error, results, fields) {
                                 console.log("hi i am here at orderlist");
             
-                                if (error["errno"]==1451) {
+                                if (error) {
                                   console.log("Bad Request", error);
                                   return res.send({
                                     "code": 400,
