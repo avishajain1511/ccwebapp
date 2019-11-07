@@ -426,24 +426,60 @@ exports.deleteRecipe = function (req, res) {
                     "failed": "Not Found"
                   })
                 } else {
-                  console.log("author_id-----------"+userid)
-                  var ins =[recipeid]
-                 var resultsqlquerry = mysql.format('Delete from recipe where id= ?', ins);
-                  connection.query(resultsqlquerry,  function (error, results, fields) {
-                    console.log("hi i am here at orderlist");
-
-                    if (error["errno"]==1451) {
-                      console.log("Bad Request", error);
-                      return res.send({
-                        "code": 400,
-                        "failed": "Bad Request, cannot delete recipe before deleting all the images"
+                  connection.query('select id from Images where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
+                    if (error) {
+                      console.log("Not Found", error);
+                      res.send({
+                        "code": 404,
+                        "failed": "Not Found"
                       })
-                    } else {
-                      res.status(204).send({ message: "No Content" });
-
                     }
+                    else {
+                      results.rows.forEach(function (img) {
+                        var params = { Bucket: process.env.bucket, Key: img.id, Body: '' };
+                        s3.deleteObject(params, function (err, data) {
+                          if (err) {
+                            logger.error(err);
+                            return response.status(500).send({
+                              error: 'Error deleting the file from storage system'
+                            });
+                          }
+                          connection.query('Delete from Images where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
+                            console.log("hi i am here at orderlist");
 
-                  });
+                            if (error) {
+                              console.log("Not Found", error);
+                              res.send({
+                                "code": 404,
+                                "failed": "Not Found"
+                              })
+                            }else{
+                              console.log("author_id-----------"+userid)
+                              var ins =[recipeid]
+                             var resultsqlquerry = mysql.format('Delete from recipe where id= ?', ins);
+                              connection.query(resultsqlquerry,  function (error, results, fields) {
+                                console.log("hi i am here at orderlist");
+            
+                                if (error["errno"]==1451) {
+                                  console.log("Bad Request", error);
+                                  return res.send({
+                                    "code": 400,
+                                    "failed": "Bad Request, cannot delete recipe before deleting all the images"
+                                  })
+                                } else {
+                                  res.status(204).send({ message: "No Content" });
+            
+                                }
+            
+                              });
+                            }
+                          });
+                        });
+
+                      });
+                    }
+                  })
+               
                 }
 
               });
