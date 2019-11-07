@@ -2,6 +2,9 @@ var bcrypt = require('bcrypt');
 var mysql = require('mysql');
 var connection = require('../models/app.model');
 const uuidv1 = require('uuid/v1');
+const aws = require('aws-sdk');
+var fs = require('fs');
+var s3 = new aws.S3();
 
 exports.registerRecipe = function (req, res) {
   var token = req.headers['authorization'];
@@ -435,7 +438,7 @@ exports.deleteRecipe = function (req, res) {
                       })
                     }
                     else {
-                      results.rows.forEach(function (img) {
+                      results.forEach(function (img) {
                         var params = { Bucket: process.env.bucket, Key: img.id, Body: '' };
                         s3.deleteObject(params, function (err, data) {
                           if (err) {
