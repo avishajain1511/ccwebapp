@@ -1,6 +1,10 @@
 version: 2
 jobs:
   build:
+    filters:
+      branches:
+        only:
+          - ${GIT_BRANCH}
     docker:
       - image: circleci/python:2.7-jessie
       - image: circleci/mysql:latest
@@ -13,6 +17,11 @@ jobs:
 
     steps:
       - checkout
+      - run: 
+          name: "Setup custom environment variables"
+          command: |
+            echo 'export MY_ENV_VAR="FOO"' >> $BASH_ENV # Redirect MY_ENV_VAR into $BASH_ENV
+      # Run a step to print what branch our code base is on.
 
       - run:
       # Our primary container isn't MYSQL so run a sleep command until it is ready
