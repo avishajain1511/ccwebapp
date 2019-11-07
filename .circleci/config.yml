@@ -2,7 +2,107 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/openjdk:8-jdk
+      - image: circleci/python:2.7-jessie
+      - image: circleci/mysql:latest
+        command: [--default-authentication-plugin=mysql_native_password]
+        environment:
+          MYSQL_ROOT_PASSWORD: Master123
+          MYSQL_DATABASE: mydb
+          MYSQL_USER: dbuser
+          MYSQL_PASSWORD: Master123
+
     steps:
       - checkout
-      
+
+      - run:
+      # Our primary container isn't MYSQL so run a sleep command until it is ready
+          name: Waiting for MySQL to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z 127.0.0.1 3306 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for MySQL && exit 1
+
+      - run:
+          name: Install MySQL CLI; Import dummy data; run an example query
+          command: |
+            sudo apt-get install mysql-client
+            mysql -h 127.0.0.1 -u dbuser -pMaster123 --execute="SHOW DATABASES"
+
+      - run:
+          name: Install packages
+          command: sudo apt update && sudo apt install wget zip unzip python2.7 python-pip -y 
+
+      - run:
+          name: Install awscli
+          command: sudo pip install awscli
+      - run:
+          name: install--node
+          command: |
+            sudo apt-get install curl
+            curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            sudo apt-get install nodejs
+            npm -v 
+      - run:
+          name: Build Artifact
+          command: |
+            ls -al
+            cd webapp
+            pwd
+            ls -al
+            npm install
+            sudo chown -R circleci /usr/lib/node_modules
+            sudo npm install -g mocha
+            mocha >> mocha.log &
+
+      - run:
+          name: Zip Artifact
+          command: |
+            echo "Hello current build number is ${CIRCLE_BUILD_NUM}"
+            aws configure set default.region us-east-1
+            pwd
+            ls -al
+            sudo rm -r webapp/node_modules/
+            mkdir -p codedeploy_artifact
+            cp infrastructure/aws/codedeploy/*.sh .
+            zip -r csye6225-web-app-${CIRCLE_BUILD_NUM}.zip webapp *.sh *.yml
+            ls -al
+            mv csye6225-web-app-${CIRCLE_BUILD_NUM}.zip codedeploy_artifact/
+            ls -al
+            pwd
+            cd codedeploy_artifact
+            ls -al
+            pwd
+            cd ..
+            pwd
+            ls -al  
+      - run:
+          name: Configure AWS Access Key ID
+          command: |
+            aws configure set aws_access_key_id \
+            ${AWS_ACCESS_KEY} \
+            --profile default
+      - run:
+          name: Configure AWS Secret Access Key
+          command: |
+            aws configure set aws_secret_access_key \
+            ${AWS_SECRET_KEY} \
+            --profile default
+      - run:
+          name: Configure AWS region
+          command: |
+            aws configure set region ${AWS_REGION} \
+            --profile default
+      # Install aws code deploy              
+      - run:
+          name: Upload Artifact to S3
+          command: |
+            aws s3 cp codedeploy_artifact/csye6225-web-app-${CIRCLE_BUILD_NUM}.zip s3://${S3_BUCKET_ADDR}/deployments/csye6225-web-app-${CIRCLE_BUILD_NUM}.zip
+      - run:
+          name: Make CodeDeploy API call
+          command: |
+            echo "calling code deploy"
+            aws deploy create-deployment --application-name csye6225-webapp --deployment-config-name CodeDeployDefault.AllAtOnce --deployment-group-name csye6225-webapp-deployment --s3-location bucket=${S3_BUCKET_ADDR},bundleType=zip,key=deployments/csye6225-web-app-${CIRCLE_BUILD_NUM}.zip

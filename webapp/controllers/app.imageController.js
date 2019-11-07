@@ -4,17 +4,26 @@ var connection = require('../models/app.model');
 const uuidv1 = require('uuid/v1');
 const aws = require('aws-sdk');
 var fs = require('fs');
+var Client = require('node-statsd-client').Client;
+const logger = require('../config/winston');
+var client = new Client("localhost", 8125);
 require('dotenv').config();
 
-aws.config.update({
-  secretAccessKey: process.env.secretAccessKey,
-  accessKeyId:process.env.accessKeyId,
-  region: process.env.region
-});
+var addImageCounter=0;
+var getImageCounter=0;
+var deleteImageCounter=0;
 var s3 = new aws.S3();
+var datbaseStart = new Date();
 
 
 exports.addRecipeImage = function (req, res, next) {
+  var appiStart = new Date();
+
+  logger.info("Add image Api");
+
+  addImageCounter=addImageCounter+1;
+  client.count("Add image API counter",addImageCounter);
+
   var token = req.headers['authorization'];
   if (!token) return res.status(400).send({ message: 'Bad Request,' });
   var recipeid = req.params['recipeId'];
@@ -51,7 +60,7 @@ exports.addRecipeImage = function (req, res, next) {
       if (error) {
         return res.status(404).send({ message: 'Recipe not found' });
       }
-      if (results.length < 0 || typeof results[0] === 'undefined') {
+      if (results.length < 0) {
 
         return res.status(404).send({ message: 'Not Found, Recipe not found for this user' });
       }
@@ -66,7 +75,7 @@ exports.addRecipeImage = function (req, res, next) {
         connection.query(result, function (error, result, fields) {
           if (error) {
             console.log(error);
-            return res.status(404).send({ message: 'Content not found' });
+            return res.status(404).send({ message: 'Npt' });
           } 
           var count = result[0].Count;
           console.log("------------" + count)
@@ -84,6 +93,12 @@ exports.addRecipeImage = function (req, res, next) {
         var uploadParams = { Bucket: process.env.bucket, Key: imageid, Body: '' };
         uploadParams.Body = fileStream;
         s3.upload(uploadParams, function (err, data1) {
+          var s3called = new Date();
+          console.log(s3called);
+          console.log(appiStart);
+          var s3Timer =s3called-appiStart;
+          console.log(s3Timer);
+          client.count("Process time for image upload to s3", s3Timer);
           if (err) {
             console.log(err);
             return res.status(400).send({ message: 'Bad Request, Please Add image correctly' });
@@ -108,9 +123,24 @@ exports.addRecipeImage = function (req, res, next) {
               ETag: data.ETag,
               ContentType: data.ContentLength,
             }
+            var databsecalled = new Date();
             connection.query('INSERT INTO Images SET ?', image, function (error, results, fields) {
+             
+              var dbapiTimer =appicalled-databsecalled;
+              console.log(dbapiTimer);
+              client.count("Process time of Image database", dbapiTimer);
+
+              var appicalled = new Date();
+              
+              console.log(appicalled);
+              console.log(appiStart);
+
+              var apiTimer =appicalled-appiStart;
+              console.log(apiTimer);
+              client.count("Process time of Image API", apiTimer);
+
               if (error) {
-                console.log("Bad Request", error);
+                console.log("Bad Request", error);  
                 res.status(400).send({
                   "failed": "Bad Request, Cannot enter recipe"
                 })
@@ -120,6 +150,8 @@ exports.addRecipeImage = function (req, res, next) {
                   "id": imageid,
                   "url":data1.Location
                  });
+
+
               }
             });
           });
@@ -136,7 +168,10 @@ exports.addRecipeImage = function (req, res, next) {
 }
 
 exports.getRecipeImage = function (req, res) {
-console.log("hi")
+  logger.info("Get Image Api");
+
+  getImageCounter=getImageCounter+1;
+  client.count("Get image API counter",getImageCounter);
   var imageid = req.params['imageId'];
   var recipeTable_idrecipe = req.params['recipeId'];
 
@@ -154,7 +189,7 @@ console.log("hi")
     else {
       var param1 = { Bucket: process.env.bucket, Key: imageid};
             s3.getObject(param1, function(err, data) {
-              if (err)  return res.status(404).send({ message: 'Not Found, image not found' });
+              if (err)  return res.status(404).send({ message: 'Not Found, Image not found' });
               // an error occurred
             });
       res.status(201).send({ 
@@ -166,6 +201,10 @@ console.log("hi")
 };
 
 exports.deleteRecipeImage = function (req, res) {
+  logger.info("Delete Image Api");
+
+  deleteImageCounter=deleteImageCounter+1;
+  client.count("Delete image API counter",deleteImageCounter);
   var token = req.headers['authorization'];
   if (!token) return res.status(400).send({ message: 'Bad Request,Please provide Authorization' });
   var recipeid = req.params['recipeId'];
@@ -196,24 +235,20 @@ console.log(username)
     var ins = [recipeid, userid]
     var resultsSelectqlquerry = mysql.format('SELECT * FROM recipe where id= ? AND author_id=?', ins);
     connection.query(resultsSelectqlquerry, function (error, results, fields) {
-      console.log(results[0])
       if (error) {
-        return res.status(401).send({ message: 'Unauthorized' });
+        return res.status(404).send({ message: 'Recipe  Not Found' });
       }
-      if (results.length < 0 || typeof results[0] === 'undefined') {
+      if (results.length < 0) {
 
         return res.status(404).send({ message: 'Not Found, Recipe not found for this user' });
       }
       else {
         console.log("----")
-        var selectSql = "SELECT count(imageName) AS Count,url,imageName,id  FROM Images WHERE id = ? AND recipeTable_idrecipe=?";
-        var insert = [imageId,recipeid];
+        var selectSql = "SELECT count(imageName) AS Count,url,imageName,id  FROM Images WHERE id = ?";
+        var insert = [imageId];
         var result = mysql.format(selectSql, insert);
         connection.query(result, function (error, result, fields) {
-          if(error){
-            return res.status(404).send({ message: 'Not Found, Image doesnot exist' });
-
-          }
+          if(error){return res.status(404).send({ message: 'Not Found, Image doesnot exist' });}
           var count = result[0].Count;
           console.log("------------" + count)
           if (count < 1) {

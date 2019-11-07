@@ -12,12 +12,12 @@ const recipeImage_controller=require('../controllers/app.imageController')
 router.post('/user', app_controller.register);
 router.get('/user/self' , app_controller.login);
 router.put('/user/self', app_controller.update);
-router.post('/user/recipe',recipie_controller.registerRecipe)    
-router.get('/user/recipe/:id',recipie_controller.getRecipe)    
-router.delete('/user/recipe/:id',recipie_controller.deleteRecipe)    
-router.put('/user/recipe/:id',recipie_controller.updateRecipe)     
+router.post('/recipe',recipie_controller.registerRecipe)    
+router.get('/recipe/:id',recipie_controller.getRecipe)    
+router.delete('/recipe/:id',recipie_controller.deleteRecipe)    
+router.put('/recipe/:id',recipie_controller.updateRecipe)     
     
-router.post('/user/recipe/:recipeId/image', upload.single('imageUpload'), function (err, req, res, next) {
+router.post('/recipe/:recipeId/image', upload.single('imageUpload'), function (err, req, res, next) {
     console.error(err.stack)
     res.status(400).send({meesage:'Bad Request ,Formdata is not correct! use imageUpload as key'})
   }

@@ -4,8 +4,23 @@ var mysql = require('mysql');
 var connection = require('../models/app.model');
 var schema = require('./passwordValidator');
 const uuidv1 = require('uuid/v1');
+var Client = require('node-statsd-client').Client;
+const logger = require('../config/winston');
+var client = new Client("localhost", 8125);
+var registerCounter=0;
+var updateCounter=0;
+var getCounter=0;
 
 exports.register = function (req, res) {
+       logger.info("Register User");
+       client.increment("Register yser incrment");
+       var start = new Date();
+
+
+registerCounter=registerCounter+1;
+client.count("count register api", registerCounter);
+
+
 
     console.log("req", req.body);
     if (req.body.firstname == null || req.body.lastname == null || (req.body.firstname).trim().length < 1 || (req.body.lastname).trim().length < 1 || req.body.password == null || req.body.email == null) {
@@ -17,7 +32,9 @@ exports.register = function (req, res) {
 
     if (!validator.validate(req.body.email)) { return res.status(400).send({ message: 'Bad Request, invalid Email' }) };
 
+
     if (!schema.validate(req.body.password)) { return res.status(400).send({ message: 'Bad Request, invalid Password' }) };
+    
 
     var salt = bcrypt.genSaltSync(10);
     var hash = bcrypt.hashSync(req.body.password, salt);
@@ -43,6 +60,10 @@ exports.register = function (req, res) {
             return res.status(400).send({ message: 'Bad Request, Invalid email' });
         }
         connection.query('INSERT INTO users SET ?', users, function (error, results, fields) {
+            var end = new Date();
+            var dif=end-start;
+            console.log(dif);
+            client.count("time to add user", dif);
             if (error) {
                 console.log("Bad Request, cannot insert user", error);
                 res.send({
@@ -50,6 +71,8 @@ exports.register = function (req, res) {
                     "failed": "Bad Request"
                 })
             }
+         
+
             var sql = 'SELECT id , firstname, lastname, email, created, modified  FROM users WHERE email = ?';
             var insert = [users.email]
             var result = mysql.format(sql, insert);
@@ -68,6 +91,9 @@ exports.register = function (req, res) {
     });
 };
 exports.update = function (req, res) {
+    updateCounter=updateCounter+1;
+    client.count("count update api", updateCounter);
+    logger.info("update User");
 
     var today = new Date();
     var token = req.headers['authorization'];
@@ -149,7 +175,9 @@ exports.update = function (req, res) {
 }
 
 exports.login = function (req, res) {
-
+    getCounter=getCounter+1;
+    client.count("count user get api", getCounter);
+    logger.info("get user");
     var token = req.headers['authorization'];
 
     if (!token) return res.status(401).send({ message: 'Unauthorization' });
