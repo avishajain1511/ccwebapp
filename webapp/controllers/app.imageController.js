@@ -10,6 +10,8 @@ var client = new Client("localhost", 8125);
 require('dotenv').config();
 
 var addImageCounter=0;
+var getImageCounter=0;
+var deleteImageCounter=0;
 var s3 = new aws.S3();
 var datbaseStart = new Date();
 
@@ -166,7 +168,10 @@ exports.addRecipeImage = function (req, res, next) {
 }
 
 exports.getRecipeImage = function (req, res) {
-console.log("hi")
+  logger.info("Get Image Api");
+
+  getImageCounter=getImageCounter+1;
+  client.count("Get image API counter",getImageCounter);
   var imageid = req.params['imageId'];
   var recipeTable_idrecipe = req.params['recipeId'];
 
@@ -196,6 +201,10 @@ console.log("hi")
 };
 
 exports.deleteRecipeImage = function (req, res) {
+  logger.info("Delete Image Api");
+
+  deleteImageCounter=deleteImageCounter+1;
+  client.count("Delete image API counter",deleteImageCounter);
   var token = req.headers['authorization'];
   if (!token) return res.status(400).send({ message: 'Bad Request,Please provide Authorization' });
   var recipeid = req.params['recipeId'];

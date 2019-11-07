@@ -1,6 +1,7 @@
 # Folder of node js
 node_modules/
 uploads/
+nohup.out
 
 # Folder of Teraforms
 terraform.tfstate
