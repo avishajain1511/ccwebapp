@@ -4,7 +4,7 @@ const app = require('./routes/app.route');
 const server = express();
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
-server.use('/v1',app);
+server.use('/v2',app);
 
 let port = 3001;
 
