@@ -3,6 +3,7 @@ var mysql = require('mysql');
 var connection = require('../models/app.model');
 const uuidv1 = require('uuid/v1');
 const aws = require('aws-sdk');
+aws.config.update({region: 'us-east-1'});
 var fs = require('fs');
 var Client = require('node-statsd-client').Client;
 const logger = require('../config/winston');
@@ -12,11 +13,9 @@ var s3 = new aws.S3();
 var registerCounter=0;
 var updateCounter=0;
 var getCounter=0;
-aws.config.update({region: 'us-east-1'});
 exports.registerRecipe = function (req, res) {
   logger.info("register recipe");
   var start = new Date();
-
 
   registerCounter=registerCounter+1;
   client.count("count register recipe api", 1);
