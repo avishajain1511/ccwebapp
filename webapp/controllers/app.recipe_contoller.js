@@ -986,7 +986,7 @@ exports.myRecipeFunction= function (req, res) {
                           let payload = {
                               default: 'Hello World',
                               data: {
-                                  Email: email,
+                                  Email: username,
                                   link: resetLink
                               }
                           };
