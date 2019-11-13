@@ -14,8 +14,8 @@ router.get('/user/self' , app_controller.login);
 router.put('/user/self', app_controller.update);
 router.post('/recipe',recipie_controller.registerRecipe)    
 router.get('/recipe/:id',recipie_controller.getRecipe)    
-router.get('/myrecipes',recipie_controller.myRecipeFunction)    
-router.post('/recipes',recipie_controller.recipes)    
+router.post('/myrecipes',recipie_controller.myRecipeFunction)    
+router.get('/recipes',recipie_controller.recipes)    
 router.delete('/recipe/:id',recipie_controller.deleteRecipe)    
 router.put('/recipe/:id',recipie_controller.updateRecipe)     
     
