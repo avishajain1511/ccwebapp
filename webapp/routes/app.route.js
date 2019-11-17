@@ -27,4 +27,9 @@ router.post('/recipe/:recipeId/image', upload.single('imageUpload'), function (e
 router.get('/recipe/:recipeId/image/:imageId',recipeImage_controller.getRecipeImage)
 router.delete('/recipe/:recipeId/image/:imageId',recipeImage_controller.deleteRecipeImage)
 module.exports=router;
+router.get('/check', function (req, res, next) {
+  res.status(200).json({
+      "message": "Check Successful"
+  });
+});
 
