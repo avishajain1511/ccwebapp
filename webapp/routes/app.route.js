@@ -29,7 +29,7 @@ router.delete('/recipe/:recipeId/image/:imageId',recipeImage_controller.deleteRe
 
 router.get('/check', function (req, res, next) {
   res.status(200).json({
-      "message": "Check Successful"
+      "message": "Check Successfull"
   });
 });
 
