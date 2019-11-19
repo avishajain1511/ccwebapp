@@ -782,11 +782,11 @@ resource "aws_codedeploy_app" "app" {
 resource "aws_codedeploy_deployment_group" "example" {
     depends_on = [aws_codedeploy_app.app]
 
-  app_name="csye6225-webapp"
-  deployment_group_name="csye6225-webapp-deployment"
-  service_role_arn       = "${aws_iam_role.role2.arn}"
-  deployment_config_name = "CodeDeployDefault.AllAtOnce"
-  deployment_style {
+    app_name="csye6225-webapp"
+    deployment_group_name="csye6225-webapp-deployment"
+    service_role_arn       = "${aws_iam_role.role2.arn}"
+    deployment_config_name = "CodeDeployDefault.AllAtOnce"
+    deployment_style {
     deployment_type   = "IN_PLACE"
     deployment_option = "WITHOUT_TRAFFIC_CONTROL"
   }
@@ -822,7 +822,7 @@ resource "aws_codedeploy_deployment_group" "example" {
 
     }
   }
-
+    autoscaling_groups = ["${aws_autoscaling_group.as_group.name}"]
 }
 
 # auto scaling launch config
@@ -1621,53 +1621,5 @@ resource "aws_cloudformation_stack" "waf" {
 }
 
 STACK
-}
-resource "aws_instance" "web-1" {
-  ami               = "${var.ami_id}"
-  instance_type     = "t2.micro"
-  key_name          = "${var.key_name}"
-  #user_data         = "${file("install_codedeploy_agent.sh")}"
-  #echo host=${var.end_point} >> .env
-  user_data         = <<-EOF
-                      #!/bin/bash -ex
-                      exec > >(tee /var/log/user-data.log|logger -t user-data -s 2>/dev/console) 2>&1
-                      echo BEGIN
-                      date '+%Y-%m-%d %H:%M:%S'
-                      echo END
-                      sudo yum update -y
-                      sudo yum install ruby -y
-                      sudo yum install wget -y
-                      cd /home/centos
-                      wget https://aws-codedeploy-us-east-1.s3.us-east-1.amazonaws.com/latest/install
-                      chmod +x ./install
-                      sudo ./install auto
-                      sudo service codedeploy-agent status
-                      sudo service codedeploy-agent start
-                      sudo service codedeploy-agent status
-                      echo host=${aws_db_instance.default.address} >> .env
-                      echo bucket=${var.s3_bucket_name} >> .env
-                      echo DOMAIN_NAME=${var.DOMAIN_NAME} >> .env
-                      chmod 777 .env
-                      mkdir webapp
-                      chmod 777 webapp
-  EOF
-  ebs_block_device {
-    device_name           = "/dev/sda1"
-    volume_size           = "20"
-    volume_type           = "gp2"
-    delete_on_termination = "true"
-  }
-  iam_instance_profile="${aws_iam_instance_profile.role1_profile.name}"
-
-
-  tags = {
-    name = "Codedeploy_ec2"
-  }
-  vpc_security_group_ids = ["${aws_security_group.web.id}"]
-
-  associate_public_ip_address = true
-  source_dest_check           = false
-  subnet_id                   = "${element(tolist(data.aws_subnet_ids.example.ids), 0)}"
-  depends_on=["aws_db_instance.default"]
 }
 
