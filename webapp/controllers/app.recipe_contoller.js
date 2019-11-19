@@ -975,7 +975,7 @@ exports.myRecipeFunction= function (req, res) {
                   var output=[];
                   results.forEach(function (img) {
                     console.log(img.id);
-                    output1='http://'+process.env.DOMAIN_NAME+'?email=' + username + '&token='+img.id;
+                    output1='http://'+process.env.DOMAIN_NAME+'/v1/recipe/' +img.id;
                     output.push(output1)  
                   })
                   let topicParams = {Name: 'EmailTopic'};
