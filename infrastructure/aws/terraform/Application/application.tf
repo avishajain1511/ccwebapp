@@ -481,6 +481,17 @@ ec2_tag_set {
 
 }
 
+resource "aws_dynamodb_table" "basic-dynamodb-table" {
+  name           = "csye6225"
+  hash_key       = "id"
+  read_capacity  = 20
+  write_capacity = 20
+  attribute {
+    name = "id"
+    type = "S"
+  }
+
+}
 
 resource "aws_iam_role_policy_attachment" "role1-attach4" {
   role       = "${aws_iam_role.role1.name}"

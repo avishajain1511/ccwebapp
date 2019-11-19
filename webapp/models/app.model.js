@@ -24,7 +24,7 @@ con.connect(function(err) {
     "PRIMARY KEY (`id`)" +
    ") ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
   var recipeSql = " CREATE TABLE IF NOT EXISTS `mydb`.`recipe` (" +
-    " `id`  varchar(100)  NOT NULL , `created_ts` datetime NOT NULL," +
+  " `id`  varchar(100)  NOT NULL , `created_ts` datetime NOT NULL," +
     "`updated_ts` datetime NOT NULL, `author_id`	varchar(255)   COLLATE utf8_unicode_ci NOT NULL," +
     "`cook_time_in_min` int COLLATE utf8_unicode_ci NOT NULL," +
     " `prep_time_in_min` int COLLATE utf8_unicode_ci NOT NULL," +
@@ -63,13 +63,13 @@ con.connect(function(err) {
     ")ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci; ";
 console.log(Imagesql)
   var orderlistSql = " CREATE TABLE IF NOT EXISTS `mydb`.`orderlist` (`id`  varchar(100)  NOT NULL ,`position` int(11) NOT NULL,`items` varchar(255) NOT NULL,`recipeTable_idrecipe` VARCHAR(100) NOT NULL, FOREIGN KEY (recipeTable_idrecipe) REFERENCES `recipe`(`id`),PRIMARY KEY (id)) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;"
-  console.log(userSql);
+  console.log(recipeSql);
   con.query(userSql, function (err, result) {
     if (err) console.log("allready exist");
     console.log("Table 1 created");
   });
   con.query(recipeSql, function (err, result) {
-    if (err) console.log("allready exist");
+    if (err) console.log(err);
     console.log("Table 2 created");
   });
   con.query(orderlistSql, function (err, result) {
