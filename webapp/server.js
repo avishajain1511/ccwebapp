@@ -6,7 +6,7 @@ server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
 server.use('/v1',app);
 
-let port = 22;
+let port = 3001;
 
 server.use(function(req, res, next){
 if (req.accepts('html')) {
