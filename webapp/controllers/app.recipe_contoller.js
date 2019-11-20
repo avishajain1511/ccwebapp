@@ -3,22 +3,22 @@ var mysql = require('mysql');
 var connection = require('../models/app.model');
 const uuidv1 = require('uuid/v1');
 const aws = require('aws-sdk');
+aws.config.update({region: 'us-east-1'});
 var fs = require('fs');
 var Client = require('node-statsd-client').Client;
 const logger = require('../config/winston');
 var client = new Client("localhost", 8125);
+var sns = new aws.SNS({});
 var s3 = new aws.S3();
 var registerCounter=0;
 var updateCounter=0;
 var getCounter=0;
-
 exports.registerRecipe = function (req, res) {
   logger.info("register recipe");
   var start = new Date();
 
-
   registerCounter=registerCounter+1;
-  client.count("count register recipe api", registerCounter);
+  client.count("count register recipe api", 1);
 
   var token = req.headers['authorization'];
   if (!token) return res.status(401).send({ message: 'No authorization token' });
@@ -377,12 +377,100 @@ exports.getRecipe = function (req, res) {
         });
       }
       else {
+        return res.status(404).send({ message: 'Recipe not found' });
+      }
+    }
+  });
+};
+exports.recipes = function (req, res) {
+  getCounter=getCounter+1;
+  client.count("count get recipe api", getCounter);
+
+  logger.info("getting recipe");
+  console.log(req.params['id']);
+
+  var recipeid = "";
+
+  var output;
+  connection.query("SELECT  id, created_ts,updated_ts,author_id,cook_time_in_min,prep_time_in_min,total_time_in_min,title,cusine,servings,ingredients FROM recipe ORDER BY created_ts DESC limit 1", recipeid, function (error, results, fields) {
+    if (error) {
+      return res.status(404).send({ message: 'Recipe Not Found' });
+    } else {
+      console.log(results[0].id);
+      recipeid=results[0].id;
+      var ingredients = [];
+      if (results.length > 0) {
+
+        var ingredientsList = JSON.stringify(results[0]['ingredients']);
+        console.log(ingredientsList);
+        ingredientsList = ingredientsList.split(",")
+
+        for (i in ingredientsList) {
+          ingredients[i] = ingredientsList[i];
+          console.log(ingredients)
+          ingredients[i] = ingredientsList[i].replace(/[\\"\[\]]/g, '');
+
+          console.log(ingredients[i]);
+        }
+
+        console.log(results[0]['steps']);
+        console.log(results[0]);
+        connection.query(' SELECT position, items from orderlist where recipeTable_idrecipe=? ', recipeid, function (error, results1, fields) {
+          if (error) {
+            return res.status(404).send({ message: 'Orderlist Data Not Found' });
+          } else {
+            console.log(results1)
+            if (results.length > 0) {
+              console.log("------------" + recipeid);
+              connection.query(' SELECT calories,cholesterol_in_mg,sodium_in_mg,carbohydrates_in_grams,protein_in_grams from NutritionInformation where recipeTable_idrecipe=? ', recipeid, function (error, results2, fields) {
+                if (error) {
+                  return res.status(404).send({ message: 'Nutrition Data Not Found' });
+                } else {
+                  if (results2.length > 0) {
+                    console.log("result------------" + results2.length);
+
+                    connection.query(' SELECT id,url from Images where recipeTable_idrecipe=? ', recipeid, function (error, image, fields) {
+                      if (error) {
+                        return res.status(404).send({ message: 'Nutrition data not found' });
+                      } else {
+                        if (image.length > 0) {
+                          output = results[0];
+                          output['Images'] = image
+                          output['ingredients'] = ingredients
+                          output['steps'] = results1
+                          output['nutrition_information'] = results2[0]
+                          console.log(results2);
+                          res.send(output);
+                        }else{
+                          output = results[0];
+                          output['Images'] = null
+                          output['ingredients'] = ingredients
+                          output['steps'] = results1
+                          output['nutrition_information'] = results2[0]
+                          console.log(results2);
+                          res.send(output);
+                        }
+                      }
+                    });
+                  }
+                  else {
+                    return res.status(400).send({ message: 'Bad  Request, No Value for this id available in NutritionInformation' });
+                  }
+                }
+              });
+            }
+            else {
+              return res.status(400).send({ message: 'Bad  Request, No Value for this id available in orderlist' });
+            }
+          }
+        });
+      }
+      else {
         return res.status(401).send({ message: 'Unautherized' });
       }
     }
   });
 };
-
 exports.deleteRecipe = function (req, res) {
   logger.info("deleting recipe");
   var recipeid = req.params['id'];
@@ -437,7 +525,7 @@ exports.deleteRecipe = function (req, res) {
             } else {
               
               connection.query('Delete from NutritionInformation where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
-                console.log("hi i am here at orderlist");
+                console.log("hi i am here at NutritionInformation");
 
                 if (error) {
                   console.log("Not Found", error);
@@ -446,6 +534,8 @@ exports.deleteRecipe = function (req, res) {
                     "failed": "Not Found"
                   })
                 } else {
+                  console.log("at select image");
+
                   connection.query('select id from Images where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
                     if (error) {
                       console.log("Not Found", error);
@@ -455,6 +545,7 @@ exports.deleteRecipe = function (req, res) {
                       })
                     }
                     else {
+                      if(results.length > 0){
                       results.forEach(function (img) {
                         console.log(img.id);
                         var params = { Bucket: process.env.bucket, Key: img.id };
@@ -466,7 +557,7 @@ exports.deleteRecipe = function (req, res) {
                             });
                           }
                           connection.query('Delete from Images where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
-                            console.log("hi i am here at orderlist");
+                            console.log("hi i am here at delete image");
 
                             if (error) {
                               console.log("Not Found", error);
@@ -479,7 +570,7 @@ exports.deleteRecipe = function (req, res) {
                               var ins =[recipeid]
                              var resultsqlquerry = mysql.format('Delete from recipe where id= ?', ins);
                               connection.query(resultsqlquerry,  function (error, results, fields) {
-                                console.log("hi i am here at orderlist");
+                                console.log("hi i am here at delete recipe");
             
                                 if (error) {
                                   console.log("Bad Request", error);
@@ -498,7 +589,12 @@ exports.deleteRecipe = function (req, res) {
                         });
 
                       });
-                    }
+                    }else {
+                    res.status(204).send({ message: "recioe not Content" });
+
+                  }
+                  }
+                  
                   })
                
                 }
@@ -508,7 +604,7 @@ exports.deleteRecipe = function (req, res) {
 
           });
         }else {
-          return res.status(400).send({ message: 'Bad Request' });
+          return res.status(404).send({ message: 'Not Found' });
 
         }
         }});
@@ -516,6 +612,8 @@ exports.deleteRecipe = function (req, res) {
           return res.status(401).send({ message: 'Unauthorized' });
 
         }
+      }else{
+        return res.status(404).send({ message: 'User Not Found' });
       }
     }
   });
@@ -838,4 +936,103 @@ var userid="";
 
     }
   });
+}
+
+exports.myRecipeFunction= function (req, res) {
+  logger.info("Get myRecipeFunction Recipe");
+
+  console.log("req", req.body);
+  var token = req.headers['authorization'];
+
+
+  var token = req.headers['authorization'];
+
+  if (!token) return res.status(401).send({ message: 'Unauthorized , No Token Provided' });
+
+  var tmp = token.split(' ');
+  var buf = new Buffer(tmp[1], 'base64');
+  var plain_auth = buf.toString();
+  var creds = plain_auth.split(':');
+
+  var username = creds[0];
+  var password = creds[1];
+
+  var userid="";
+  if (username == null || password == null) {
+    return res.status(400).send({ message: 'Bad Request, Authetication cannot be complete without eamil and password' });
+  }
+  console.log("user" + username, "password " + password);
+
+  client.count("count register recipe api", 1);
+  connection.query('SELECT * FROM users WHERE email = ?', username, function (error, results, fields) {
+    if (error) {
+      return res.status(404).send({ message: 'User Not Found' });
+    } else {
+      if (results.length > 0) {
+        userid=results[0].id;
+        if (bcrypt.compareSync(password, results[0].password)) {
+          var ins =[userid]
+         var resultsSelectqlquerry = mysql.format('SELECT id FROM recipe where author_id=?', ins);
+         console.log("==========================="+resultsSelectqlquerry);
+            connection.query(resultsSelectqlquerry, function (error, results, fields) {
+              if (error) {console.log("Bad Request", error);
+              res.send({
+                "code": 404,
+                "failed": "Not Found"
+              })}else{
+                console.log(results.length);
+                if (results.length > 0) {
+                  var output=[];
+                  results.forEach(function (img) {
+                    console.log(img.id);
+                    output1='https://'+process.env.DOMAIN_NAME+'/v1/recipe/' +img.id;
+                    output.push(output1)  
+                  })
+                  let topicParams = {Name: 'EmailTopic'};
+                  sns.createTopic(topicParams, (err, data) => {
+                      if (err) console.log(err);
+                      else {
+                          let resetLink = output
+                          let payload = {
+                              default: 'Hello World',
+                              data: {
+                                  Email: username,
+                                  link: resetLink
+                              }
+                          };
+                          payload.data = JSON.stringify(payload.data);
+                          payload = JSON.stringify(payload);
+  
+                          let params = {Message: payload, TopicArn: data.TopicArn}
+                          sns.publish(params, (err, data) => {
+                              if (err) console.log(err)
+                              else {
+                                  console.log('published')
+                                  res.status(201).json({
+                                      "message": "Reset password link sent on email Successfully!"
+                                  });
+                              }
+                          })
+                      }
+                  })
+  
+        
+
+                }else{
+                  return res.status(401).send({ message: 'Unauthorized' });
+                
+              }
+              }
+            })
+          }else{
+            return res.status(401).send({ message: 'Unauthorized' });
+          
+        }
+        }else{
+            return res.status(404).send({ message: 'User Not Found' });
+          
+        }
+      }
+    })
+
 }

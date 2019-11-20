@@ -34,13 +34,11 @@ jobs:
               sleep 1
             done
             echo Failed waiting for MySQL && exit 1
-
       - run:
           name: Install MySQL CLI; Import dummy data; run an example query
           command: |
             sudo apt-get install mysql-client
             mysql -h 127.0.0.1 -u dbuser -pMaster123 --execute="SHOW DATABASES"
-
       - run:
           name: Install packages
           command: sudo apt update && sudo apt install wget zip unzip python2.7 python-pip -y 
@@ -66,7 +64,6 @@ jobs:
             sudo chown -R circleci /usr/lib/node_modules
             sudo npm install -g mocha
             mocha >> mocha.log &
-
       - run:
           name: Zip Artifact
           command: |

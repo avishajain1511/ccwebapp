@@ -14,6 +14,8 @@ router.get('/user/self' , app_controller.login);
 router.put('/user/self', app_controller.update);
 router.post('/recipe',recipie_controller.registerRecipe)    
 router.get('/recipe/:id',recipie_controller.getRecipe)    
+router.post('/myrecipes',recipie_controller.myRecipeFunction)    
+router.get('/recipes',recipie_controller.recipes)    
 router.delete('/recipe/:id',recipie_controller.deleteRecipe)    
 router.put('/recipe/:id',recipie_controller.updateRecipe)     
     
@@ -24,5 +26,12 @@ router.post('/recipe/:recipeId/image', upload.single('imageUpload'), function (e
   ,recipeImage_controller.addRecipeImage)
 router.get('/recipe/:recipeId/image/:imageId',recipeImage_controller.getRecipeImage)
 router.delete('/recipe/:recipeId/image/:imageId',recipeImage_controller.deleteRecipeImage)
+
+router.get('/check', function (req, res, next) {
+  res.status(200).json({
+      "message": "Check Successful"
+  });
+});
+
 module.exports=router;
 
