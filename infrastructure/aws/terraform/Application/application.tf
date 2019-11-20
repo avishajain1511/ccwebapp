@@ -65,7 +65,9 @@ resource "aws_lambda_function" "func" {
   environment {
     variables = {
       DOMAIN_NAME = "${var.DOMAIN_NAME}"
-    }
+
+    ttl = "${var.ttl}"
+}
 }
 }
 
@@ -782,11 +784,11 @@ resource "aws_codedeploy_app" "app" {
 resource "aws_codedeploy_deployment_group" "example" {
     depends_on = [aws_codedeploy_app.app]
 
-    app_name="csye6225-webapp"
-    deployment_group_name="csye6225-webapp-deployment"
-    service_role_arn       = "${aws_iam_role.role2.arn}"
-    deployment_config_name = "CodeDeployDefault.AllAtOnce"
-    deployment_style {
+  app_name="csye6225-webapp"
+  deployment_group_name="csye6225-webapp-deployment"
+  service_role_arn       = "${aws_iam_role.role2.arn}"
+  deployment_config_name = "CodeDeployDefault.AllAtOnce"
+  deployment_style {
     deployment_type   = "IN_PLACE"
     deployment_option = "WITHOUT_TRAFFIC_CONTROL"
   }
@@ -802,6 +804,7 @@ resource "aws_codedeploy_deployment_group" "example" {
       type  = "KEY_AND_VALUE"
       value = "Codedeploy_ec2"
     }
+    
 }
 
 
@@ -823,6 +826,7 @@ resource "aws_codedeploy_deployment_group" "example" {
     }
   }
     autoscaling_groups = ["${aws_autoscaling_group.as_group.name}"]
+
 }
 
 # auto scaling launch config

@@ -13,6 +13,9 @@ variable "DOMAIN_NAME" {
   type = "string"
   
 }
+variable "ttl" {
+  type="string"
+}
 
 variable "ami_id" {
   type = "string"
