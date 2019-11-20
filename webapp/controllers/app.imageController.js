@@ -201,10 +201,12 @@ exports.getRecipeImage = function (req, res) {
 };
 
 exports.deleteRecipeImage = function (req, res) {
+  console.log("inside delete")
+
   logger.info("Delete Image Api");
 
   deleteImageCounter=deleteImageCounter+1;
-  client.count("Delete image API counter",deleteImageCounter);
+  client.count("Delete image API counter",1);
   var token = req.headers['authorization'];
   if (!token) return res.status(400).send({ message: 'Bad Request,Please provide Authorization' });
   var recipeid = req.params['recipeId'];
@@ -238,7 +240,7 @@ console.log(username)
       if (error) {
         return res.status(404).send({ message: 'Recipe  Not Found' });
       }
-      if (results.length < 0) {
+      if (results.length < 0  || typeof results[0] === 'undefined') {
 
         return res.status(404).send({ message: 'Not Found, Recipe not found for this user' });
       }
