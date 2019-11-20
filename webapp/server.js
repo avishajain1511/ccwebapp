@@ -4,7 +4,7 @@ const app = require('./routes/app.route');
 const server = express();
 server.use(bodyParser.urlencoded({ extended: true }));
 server.use(bodyParser.json());
-server.use('/v2',app);
+server.use('/v1',app);
 
 let port = 3001;
 
@@ -18,11 +18,6 @@ server.listen(port,()=>{
 console.log('Server is up and running on port number' + port);
 
 });
-server.use(function(req, res, next) {
-  if ((req.get('X-Forwarded-Proto') !== 'https')) {
-    res.redirect('https://' + req.get('Host') + req.url);
-  } else
-    next();
-});
+
 module.exports = server;
 
