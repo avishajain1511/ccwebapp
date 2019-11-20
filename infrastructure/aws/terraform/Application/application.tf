@@ -746,30 +746,30 @@ resource "aws_autoscaling_policy" "as_policy2" {
 resource "aws_cloudwatch_metric_alarm" "as_policy3" {
   alarm_name          = "CPUAlarmHigh"
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods  = "2"
+  evaluation_periods  = "${var.evaluation_periods}"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = "300"
+  period              = "${var.period}"
   statistic           = "Average"
-  threshold           = "90"
+  threshold           = "${var.highthreshold}"
 
   dimensions = {
     AutoScalingGroupName = "${aws_autoscaling_group.as_group.name}"
   }
 
-  alarm_description = "Scale-up if CPU > 90% for 10 minutes"
+  alarm_description = "Scale-up if CPU > 50% for 10 minutes"
   alarm_actions     = ["${aws_autoscaling_policy.as_policy1.arn}"]
 }
 
 resource "aws_cloudwatch_metric_alarm" "as_policy4" {
   alarm_name          = "CPUAlarmLow"
   comparison_operator = "LessThanThreshold"
-  evaluation_periods  = "2"
+  evaluation_periods  = "${var.evaluation_periods}"
   metric_name         = "CPUUtilization"
   namespace           = "AWS/EC2"
-  period              = "300"
+  period              = "${var.period}"
   statistic           = "Average"
-  threshold           = "70"
+  threshold           = "${var.lowthreshold}"
   dimensions = {
     AutoScalingGroupName = "${aws_autoscaling_group.as_group.name}"
   }

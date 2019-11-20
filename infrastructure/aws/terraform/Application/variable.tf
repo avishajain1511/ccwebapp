@@ -5,6 +5,18 @@ description = "Which environment do you want (options: dev,prod):"
 variable "aws_region"{
     type="string"
 }
+variable "evaluation_periods" {
+   type="string"
+}
+variable "period" {
+     type="string"
+}
+variable "lowthreshold" {
+  type="string"
+}
+variable "highthreshold" {
+    type="string"
+}
 
 variable "vpc_id" {
   type = "string"
