@@ -5,9 +5,28 @@ description = "Which environment do you want (options: dev,prod):"
 variable "aws_region"{
     type="string"
 }
+variable "evaluation_periods" {
+   type="string"
+}
+variable "period" {
+     type="string"
+}
+variable "lowthreshold" {
+  type="string"
+}
+variable "highthreshold" {
+    type="string"
+}
 
 variable "vpc_id" {
   type = "string"
+}
+variable "DOMAIN_NAME" {
+  type = "string"
+  
+}
+variable "ttl" {
+  type="string"
 }
 
 variable "ami_id" {
@@ -53,8 +72,6 @@ variable "s3_bucket_name_application" {
 variable "end_point" {
   type = "string"
 }
-
-
-
-
-
+variable "s3_bucket_name_lambda" {
+    type = "string"
+}

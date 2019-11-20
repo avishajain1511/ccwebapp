@@ -377,7 +377,7 @@ exports.getRecipe = function (req, res) {
         });
       }
       else {
-        return res.status(401).send({ message: 'Unautherized' });
+        return res.status(404).send({ message: 'Recipe not found' });
       }
     }
   });
@@ -525,7 +525,7 @@ exports.deleteRecipe = function (req, res) {
             } else {
               
               connection.query('Delete from NutritionInformation where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
-                console.log("hi i am here at orderlist");
+                console.log("hi i am here at NutritionInformation");
 
                 if (error) {
                   console.log("Not Found", error);
@@ -534,6 +534,8 @@ exports.deleteRecipe = function (req, res) {
                     "failed": "Not Found"
                   })
                 } else {
+                  console.log("at select image");
+
                   connection.query('select id from Images where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
                     if (error) {
                       console.log("Not Found", error);
@@ -543,6 +545,7 @@ exports.deleteRecipe = function (req, res) {
                       })
                     }
                     else {
+                      if(results.length > 0){
                       results.forEach(function (img) {
                         console.log(img.id);
                         var params = { Bucket: process.env.bucket, Key: img.id };
@@ -554,7 +557,7 @@ exports.deleteRecipe = function (req, res) {
                             });
                           }
                           connection.query('Delete from Images where recipeTable_idrecipe= ?', recipeid, function (error, results, fields) {
-                            console.log("hi i am here at orderlist");
+                            console.log("hi i am here at delete image");
 
                             if (error) {
                               console.log("Not Found", error);
@@ -567,7 +570,7 @@ exports.deleteRecipe = function (req, res) {
                               var ins =[recipeid]
                              var resultsqlquerry = mysql.format('Delete from recipe where id= ?', ins);
                               connection.query(resultsqlquerry,  function (error, results, fields) {
-                                console.log("hi i am here at orderlist");
+                                console.log("hi i am here at delete recipe");
             
                                 if (error) {
                                   console.log("Bad Request", error);
@@ -586,7 +589,12 @@ exports.deleteRecipe = function (req, res) {
                         });
 
                       });
-                    }
+                    }else {
+                    res.status(204).send({ message: "recioe not Content" });
+
+                  }
+                  }
+                  
                   })
                
                 }
@@ -596,7 +604,7 @@ exports.deleteRecipe = function (req, res) {
 
           });
         }else {
-          return res.status(400).send({ message: 'Bad Request' });
+          return res.status(404).send({ message: 'Not Found' });
 
         }
         }});
@@ -604,6 +612,8 @@ exports.deleteRecipe = function (req, res) {
           return res.status(401).send({ message: 'Unauthorized' });
 
         }
+      }else{
+        return res.status(404).send({ message: 'User Not Found' });
       }
     }
   });
@@ -975,7 +985,7 @@ exports.myRecipeFunction= function (req, res) {
                   var output=[];
                   results.forEach(function (img) {
                     console.log(img.id);
-                    output1='http://'+process.env.DOMAIN_NAME+'/v1/recipe/' +img.id;
+                    output1='https://'+process.env.DOMAIN_NAME+'/v1/recipe/' +img.id;
                     output.push(output1)  
                   })
                   let topicParams = {Name: 'EmailTopic'};
@@ -1008,15 +1018,19 @@ exports.myRecipeFunction= function (req, res) {
   
         
 
-                }
+                }else{
+                  return res.status(401).send({ message: 'Unauthorized' });
+                
+              }
               }
             })
-          }
+          }else{
+            return res.status(401).send({ message: 'Unauthorized' });
+          
+        }
         }else{
-          res.send({
-            "code": 404,
-            "failed": "Not Found"
-          })
+            return res.status(404).send({ message: 'User Not Found' });
+          
         }
       }
     })

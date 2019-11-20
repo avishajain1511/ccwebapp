@@ -6,7 +6,7 @@ cd ~
 FILE=.env
 if test -f "$FILE"; then
     echo "$FILE exist"
-    sudo mv /home/centos/.env /home/centos/webapp/
+    sudo cp /home/centos/.env /home/centos/webapp/
 fi
 
 if ! test -f "$FILE"; then
