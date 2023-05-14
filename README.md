@@ -1,5 +1,7 @@
 Readme.md
 # CSYE 6225 - Fall 2019
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Favishajain1511%2Fccwebapp.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Favishajain1511%2Fccwebapp?ref=badge_shield)
+
 
 
 ## Team  Information
@@ -74,3 +76,7 @@ For Terraforms use
     Terraform destroy
 
 Change the paramters in .tfvars file to make changes in VPC properties
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Favishajain1511%2Fccwebapp.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Favishajain1511%2Fccwebapp?ref=badge_large)
