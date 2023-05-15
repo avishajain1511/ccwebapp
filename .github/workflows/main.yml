@@ -15,3 +15,4 @@ jobs:
             uses: MeterianHQ/meterian-github-action@v1.0.13
             with:
               oss: true
+              cyclonedx: .sbom
