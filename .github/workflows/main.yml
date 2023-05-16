@@ -9,9 +9,6 @@ jobs:
             uses: actions/checkout@v3
           - name: Meterian Scanner
             uses: MeterianHQ/meterian-github-action@v1.0.13
-            with:
-              oss: true
-              autofix_with_report: true
             env:
                 METERIAN_API_TOKEN: "3005972d-065a-4529-935f-33a2b08721dc"
                 GITHUB_TOKEN: "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"
